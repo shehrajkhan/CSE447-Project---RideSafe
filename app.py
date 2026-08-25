@@ -31,9 +31,11 @@ def create_app():
     app.register_blueprint(sessions_bp)
     app.register_blueprint(admin_bp)
 
+    from flask import redirect, url_for
+
     @app.route("/")
     def index():
-        return "RideSafe is running."
+        return redirect(url_for("auth.login"))
 
     return app
 

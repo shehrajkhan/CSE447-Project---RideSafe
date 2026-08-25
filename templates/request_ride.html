@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Request a ride - RideSafe{% endblock %}
+{% block content %}
+<h2>Request a ride</h2>
+<form method="POST">
+    <label>Pickup location<br><input type="text" name="pickup" required></label><br><br>
+    <label>Drop-off location<br><input type="text" name="dropoff" required></label><br><br>
+    <label>Time<br><input type="text" name="timing" placeholder="e.g. Today 5:30 PM" required></label><br><br>
+    <button type="submit">Request ride</button>
+</form>
+<p><a href="{{ url_for('trips.dashboard') }}">Back to dashboard</a></p>
+{% endblock %}

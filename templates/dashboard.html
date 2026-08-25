@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - RideSafe{% endblock %}
+{% block content %}
+<h2>Your trips</h2>
+<p><a href="{{ url_for('trips.request_ride') }}">+ Request a ride</a></p>
+
+{% if trips %}
+<table border="1" cellpadding="8" style="border-collapse: collapse; width: 100%;">
+    <tr><th>Pickup</th><th>Drop-off</th><th>Timing</th><th>Status</th><th>Requested</th></tr>
+    {% for trip in trips %}
+    <tr>
+        <td>{{ trip.pickup }}</td>
+        <td>{{ trip.dropoff }}</td>
+        <td>{{ trip.timing }}</td>
+        <td>{{ trip.status }}</td>
+        <td>{{ trip.created_at }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>No trips yet.</p>
+{% endif %}
+
+<form method="POST" action="{{ url_for('auth.logout') }}" style="margin-top: 24px;">
+    <button type="submit">Log out</button>
+</form>
+{% endblock %}

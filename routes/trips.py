@@ -1,41 +1,95 @@
 """
-routes/trips.py - Ride requests & trip logs (the "posts" of this project).
+routes/trips.py - Ride requests & trip logs, encrypted with real ECC.
 
-Uses: crypto/ecc.py to encrypt pickup/drop-off/timing data, crypto/mac.py
-(whoever owns sessions/RBAC's module) to tag each record for tamper detection.
+This is the module that actually exercises the finished crypto/ecc.py -
+pickup, drop-off, and timing are genuinely encrypted before storage and
+decrypted only for the requesting user.
 """
 
-from flask import Blueprint, jsonify
+from flask import Blueprint, request, render_template, redirect, url_for, g
+import psycopg2.extras
+
+import db
+from crypto import ecc
+from routes.sessions import require_login
 
 trips_bp = Blueprint("trips", __name__, url_prefix="/trips")
 
 
-@trips_bp.route("/", methods=["GET"])
-def list_trips():
-    """
-    TODO:
-      1. Require a valid session (routes/sessions.py)
-      2. Fetch the user's encrypted trip rows from Supabase
-      3. Decrypt each with crypto.ecc.decrypt()
-      4. Re-verify the MAC tag on each (crypto.mac.verify_mac()) before
-         trusting/displaying the decrypted data - reject/flag mismatches
-    """
-    return jsonify({"status": "not_implemented", "route": "list_trips"}), 501
+def _get_ecc_keys(user_id):
+    with db.get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT ecc_public_key, ecc_private_key_encrypted FROM user_keys WHERE user_id = %s",
+                (user_id,),
+            )
+            row = cur.fetchone()
+    public_key = row[0]
+    # NOTE: private key is stored unwrapped (flagged _todo) until the Key
+    # Management Module wraps it with a password-derived key - so for now
+    # we just read the raw value straight out.
+    private_key = row[1]["raw"]
+    return public_key, private_key
 
 
-@trips_bp.route("/request", methods=["POST"])
+@trips_bp.route("/dashboard", methods=["GET"])
+@require_login
+def dashboard():
+    public_key, private_key = _get_ecc_keys(g.user_id)
+
+    with db.get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT id, pickup_encrypted, dropoff_encrypted, timing_encrypted, status, created_at
+                FROM trips WHERE rider_id = %s ORDER BY created_at DESC
+                """,
+                (g.user_id,),
+            )
+            rows = cur.fetchall()
+
+    trips = []
+    for trip_id, pickup_enc, dropoff_enc, timing_enc, status, created_at in rows:
+        pickup = ecc.decrypt(pickup_enc, private_key).decode("utf-8", errors="replace")
+        dropoff = ecc.decrypt(dropoff_enc, private_key).decode("utf-8", errors="replace")
+        timing = ecc.decrypt(timing_enc, private_key).decode("utf-8", errors="replace")
+        trips.append({
+            "id": trip_id, "pickup": pickup, "dropoff": dropoff,
+            "timing": timing, "status": status, "created_at": created_at,
+        })
+
+    return render_template("dashboard.html", trips=trips)
+
+
+@trips_bp.route("/request", methods=["GET", "POST"])
+@require_login
 def request_ride():
-    """
-    TODO:
-      1. Collect pickup/drop-off/timing from the form
-      2. Encrypt with crypto.ecc.encrypt() using the driver's/rider's public key
-      3. Compute a MAC over the ciphertext (crypto.mac.compute_mac())
-      4. Store {ciphertext, mac} in Supabase
-    """
-    return jsonify({"status": "not_implemented", "route": "request_ride"}), 501
+    if request.method == "GET":
+        return render_template("request_ride.html")
 
+    pickup = request.form["pickup"].strip()
+    dropoff = request.form["dropoff"].strip()
+    timing = request.form["timing"].strip()
 
-@trips_bp.route("/<trip_id>/log", methods=["POST"])
-def log_trip_event(trip_id):
-    """TODO: append an encrypted+MAC-tagged event to an ongoing trip."""
-    return jsonify({"status": "not_implemented", "route": "log_trip_event", "trip_id": trip_id}), 501
+    public_key, _ = _get_ecc_keys(g.user_id)
+
+    # Real ECC/ECIES encryption - a fresh ephemeral key is used each time
+    pickup_enc = ecc.encrypt(pickup.encode(), public_key)
+    dropoff_enc = ecc.encrypt(dropoff.encode(), public_key)
+    timing_enc = ecc.encrypt(timing.encode(), public_key)
+
+    with db.get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO trips (rider_id, pickup_encrypted, dropoff_encrypted, timing_encrypted)
+                VALUES (%s, %s, %s, %s)
+                """,
+                (
+                    g.user_id, psycopg2.extras.Json(pickup_enc),
+                    psycopg2.extras.Json(dropoff_enc), psycopg2.extras.Json(timing_enc),
+                ),
+            )
+        conn.commit()
+
+    return redirect(url_for("trips.dashboard"))

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Register - RideSafe{% endblock %}
+{% block content %}
+<h2>Create an account</h2>
+<form method="POST">
+    <label>Username<br><input type="text" name="username" required></label><br><br>
+    <label>Password<br><input type="password" name="password" required></label><br><br>
+    <label>Email<br><input type="email" name="email" required></label><br><br>
+    <label>Contact number<br><input type="text" name="contact"></label><br><br>
+    <label>I am a...<br>
+        <select name="role">
+            <option value="rider">Rider</option>
+            <option value="driver">Driver</option>
+        </select>
+    </label><br><br>
+    <button type="submit">Register</button>
+</form>
+<p>Already have an account? <a href="{{ url_for('auth.login') }}">Log in</a></p>
+{% endblock %}
