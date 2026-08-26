@@ -2,14 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}RideSafe{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <header>
-        <h1><a href="{{ url_for('trips.dashboard') }}">RideSafe</a></h1>
+    <header class="topbar">
+        <a href="{{ url_for('trips.dashboard') }}">
+            <svg class="lock-glyph" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="7" width="10" height="7" rx="2" stroke="white" stroke-width="1.4"/>
+                <path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="white" stroke-width="1.4"/>
+            </svg>
+            RideSafe
+        </a>
     </header>
-    <main>
+    <main class="{% block main_class %}{% endblock %}">
         {% block content %}{% endblock %}
     </main>
 </body>

@@ -1,11 +1,297 @@
-body {
-    font-family: system-ui, sans-serif;
-    max-width: 720px;
-    margin: 40px auto;
-    padding: 0 16px;
-    color: #222;
+/* ============================================================
+   RideSafe design system
+   Palette: deep navy ink + electric coral, cool off-white surface
+   Type: Space Grotesk (display) / IBM Plex Sans (body) / IBM Plex Mono (labels)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap');
+
+:root {
+    --ink: #10243E;
+    --ink-soft: #24405F;
+    --paper: #F5F6FA;
+    --paper-card: #FFFFFF;
+    --coral: #FF5D73;
+    --coral-dark: #E8465D;
+    --mint: #4FD1AE;
+    --line: #E1E5EE;
+    --text: #16233A;
+    --text-muted: #6B7686;
+
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'IBM Plex Sans', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+
+    --radius: 18px;
+    --shadow: 0 8px 24px rgba(16, 36, 62, 0.08);
 }
 
-header h1 {
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: var(--font-body);
+    background: var(--paper);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ---- Top bar ---- */
+header.topbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 28px;
+    background: var(--ink);
+}
+
+header.topbar a {
+    color: white;
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.25rem;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+header.topbar .lock-glyph {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+/* ---- Page shell ---- */
+main {
+    max-width: 480px;
+    margin: 48px auto;
+    padding: 0 20px;
+}
+
+main.wide {
+    max-width: 720px;
+}
+
+/* ---- Card ---- */
+.card {
+    background: var(--paper-card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 36px 32px;
+}
+
+h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
     font-size: 1.5rem;
+    margin: 0 0 6px 0;
+    letter-spacing: -0.01em;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    margin: 0 0 28px 0;
+}
+
+/* ---- Forms ---- */
+.field {
+    margin-bottom: 18px;
+}
+
+.field label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.field input,
+.field select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    background: var(--paper);
+    color: var(--text);
+    transition: border-color 0.15s ease;
+}
+
+.field input:focus,
+.field select:focus {
+    outline: none;
+    border-color: var(--coral);
+}
+
+.btn {
+    display: inline-block;
+    width: 100%;
+    padding: 13px 20px;
+    border: none;
+    border-radius: 10px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.btn-primary {
+    background: var(--coral);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--coral-dark);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--ink);
+    border: 1.5px solid var(--line);
+}
+
+.btn-secondary:hover {
+    border-color: var(--ink);
+}
+
+.link-row {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+}
+
+.link-row a {
+    color: var(--coral-dark);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.error-msg {
+    background: #FFF1F2;
+    color: var(--coral-dark);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    margin-bottom: 18px;
+}
+
+/* ---- Route glyph: signature element (pickup --- dropoff) ---- */
+.route-glyph {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.route-glyph .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--coral);
+    flex-shrink: 0;
+}
+
+.route-glyph .dot.end {
+    background: var(--ink);
+}
+
+.route-glyph .dash-line {
+    flex: 1;
+    height: 0;
+    border-top: 1.5px dashed var(--line);
+    min-width: 18px;
+}
+
+/* ---- Trip cards on dashboard ---- */
+.trip-card {
+    background: var(--paper-card);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 18px 20px;
+    margin-bottom: 12px;
+}
+
+.trip-card .route-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.trip-card .place {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.92rem;
+}
+
+.trip-card .meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.status-pill {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 3px 10px;
+    border-radius: 100px;
+    background: rgba(79, 209, 174, 0.15);
+    color: #1B8A6E;
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 40px 20px;
+    font-size: 0.92rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.section-header h2 { margin: 0; }
+
+.fab-link {
+    background: var(--coral);
+    color: white;
+    text-decoration: none;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 10px 16px;
+    border-radius: 100px;
+    white-space: nowrap;
+}
+
+form.logout-form {
+    margin-top: 28px;
+}
+
+form.logout-form button {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
 }

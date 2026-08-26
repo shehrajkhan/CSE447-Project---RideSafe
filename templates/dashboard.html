@@ -1,27 +1,36 @@
 {% extends "base.html" %}
-{% block title %}Dashboard - RideSafe{% endblock %}
+{% block title %}Your trips - RideSafe{% endblock %}
+{% block main_class %}wide{% endblock %}
 {% block content %}
-<h2>Your trips</h2>
-<p><a href="{{ url_for('trips.request_ride') }}">+ Request a ride</a></p>
+<div class="section-header">
+    <h2>Your trips</h2>
+    <a href="{{ url_for('trips.request_ride') }}" class="fab-link">+ Request a ride</a>
+</div>
 
 {% if trips %}
-<table border="1" cellpadding="8" style="border-collapse: collapse; width: 100%;">
-    <tr><th>Pickup</th><th>Drop-off</th><th>Timing</th><th>Status</th><th>Requested</th></tr>
     {% for trip in trips %}
-    <tr>
-        <td>{{ trip.pickup }}</td>
-        <td>{{ trip.dropoff }}</td>
-        <td>{{ trip.timing }}</td>
-        <td>{{ trip.status }}</td>
-        <td>{{ trip.created_at }}</td>
-    </tr>
+    <div class="trip-card">
+        <div class="route-row">
+            <div class="route-glyph">
+                <span class="dot start"></span>
+                <span class="dash-line"></span>
+                <span class="dot end"></span>
+            </div>
+        </div>
+        <div class="place">{{ trip.pickup }} &rarr; {{ trip.dropoff }}</div>
+        <div class="meta-row" style="margin-top: 8px;">
+            <span>{{ trip.timing }}</span>
+            <span class="status-pill">{{ trip.status }}</span>
+        </div>
+    </div>
     {% endfor %}
-</table>
 {% else %}
-<p>No trips yet.</p>
+    <div class="card empty-state">
+        No trips yet — request your first ride to see it here.
+    </div>
 {% endif %}
 
-<form method="POST" action="{{ url_for('auth.logout') }}" style="margin-top: 24px;">
+<form method="POST" action="{{ url_for('auth.logout') }}" class="logout-form">
     <button type="submit">Log out</button>
 </form>
 {% endblock %}
