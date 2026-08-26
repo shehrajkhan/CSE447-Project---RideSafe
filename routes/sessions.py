@@ -34,19 +34,22 @@ def issue_session(user_id: str) -> str:
 
 
 def validate_session(token: str):
+    """Validates the session token and returns a tuple of (user_id, role) if valid, otherwise None."""
     if not token:
         return None
     with db.get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute(
                 """
-                SELECT user_id FROM sessions
-                WHERE token = %s AND revoked = false AND expires_at > now()
+                SELECT s.user_id, u.role
+                FROM sessions s
+                JOIN users u ON s.user_id = u.id
+                WHERE s.token = %s AND s.revoked = false AND s.expires_at > now()
                 """,
                 (token,),
             )
             row = cur.fetchone()
-    return str(row[0]) if row else None
+    return (str(row[0]), row[1]) if row else None
 
 
 def revoke_session(token: str) -> None:
@@ -63,10 +66,11 @@ def require_login(view_func):
     @wraps(view_func)
     def wrapped(*args, **kwargs):
         token = request.cookies.get("session_token")
-        user_id = validate_session(token)
-        if not user_id:
+        session_data = validate_session(token)
+        if not session_data:
             return redirect(url_for("auth.login"))
-        g.user_id = user_id
+        
+        g.user_id, g.user_role = session_data
         return view_func(*args, **kwargs)
     return wrapped
 
@@ -74,5 +78,5 @@ def require_login(view_func):
 @sessions_bp.route("/validate", methods=["POST"])
 def validate():
     token = request.cookies.get("session_token")
-    user_id = validate_session(token)
-    return {"valid": bool(user_id)}
+    session_data = validate_session(token)
+    return {"valid": bool(session_data)}

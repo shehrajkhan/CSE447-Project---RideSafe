@@ -1,36 +1,88 @@
 {% extends "base.html" %}
-{% block title %}Your trips - RideSafe{% endblock %}
+
+{% block title %}Dashboard - RideSafe{% endblock %}
 {% block main_class %}wide{% endblock %}
+
 {% block content %}
-<div class="section-header">
+<div class="dashboard-header">
     <h2>Your trips</h2>
-    <a href="{{ url_for('trips.request_ride') }}" class="fab-link">+ Request a ride</a>
+    {% if user_role == 'rider' %}
+        <a href="{{ url_for('trips.request_ride') }}" class="btn btn-primary btn-sm">+ Request a ride</a>
+    {% endif %}
 </div>
 
 {% if trips %}
-    {% for trip in trips %}
-    <div class="trip-card">
-        <div class="route-row">
-            <div class="route-glyph">
-                <span class="dot start"></span>
-                <span class="dash-line"></span>
-                <span class="dot end"></span>
+    <div class="trip-list">
+        {% for trip in trips %}
+            <div class="card trip-card">
+                <div class="trip-info">
+                    <div class="trip-route">
+                        <span class="route-dots"></span>
+                        <strong class="route-text">{{ trip.pickup }} &rarr; {{ trip.dropoff }}</strong>
+                    </div>
+                    <div class="trip-meta">
+                        <span class="trip-time">{{ trip.timing }}</span>
+                    </div>
+                </div>
+
+                <div class="trip-action-status" style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                    <!-- Status Badge + Chat Icon Container -->
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <!-- Status Badge -->
+                        <span class="badge badge-{{ trip.status|lower }}">
+                            {{ trip.status|replace('_', ' ')|upper }}
+                        </span>
+
+                        <!-- Encrypted Chat Icon Button -->
+                        {% if trip.status in ['accepted', 'arrived', 'in_progress'] %}
+                            <a href="{{ url_for('chat.room', trip_id=trip.id) }}" 
+                               class="btn btn-info btn-sm" 
+                               style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border-radius: 50%; text-decoration: none;"
+                               title="Open Chat"
+                               aria-label="Open Chat">
+                                <i class="fa-solid fa-comments"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    <!-- Driver Interaction Controls -->
+                    {% if user_role == 'driver' %}
+                        <div class="driver-actions" style="margin-top: 5px;">
+                            {% if trip.status == 'requested' %}
+                                <form action="{{ url_for('trips.accept_ride', trip_id=trip.id) }}" method="POST">
+                                    <button type="submit" class="btn btn-primary btn-sm">Accept Ride</button>
+                                </form>
+                            {% elif trip.status == 'accepted' and trip.driver_id == g.user_id %}
+                                <form action="{{ url_for('trips.update_status', trip_id=trip.id) }}" method="POST">
+                                    <input type="hidden" name="status" value="arrived">
+                                    <button type="submit" class="btn btn-secondary btn-sm">Mark Arrived</button>
+                                </form>
+                            {% elif trip.status == 'arrived' and trip.driver_id == g.user_id %}
+                                <form action="{{ url_for('trips.update_status', trip_id=trip.id) }}" method="POST">
+                                    <input type="hidden" name="status" value="in_progress">
+                                    <button type="submit" class="btn btn-primary btn-sm">Start Ride</button>
+                                </form>
+                            {% elif trip.status == 'in_progress' and trip.driver_id == g.user_id %}
+                                <form action="{{ url_for('trips.update_status', trip_id=trip.id) }}" method="POST">
+                                    <input type="hidden" name="status" value="completed">
+                                    <button type="submit" class="btn btn-secondary btn-sm">Complete Ride</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
             </div>
-        </div>
-        <div class="place">{{ trip.pickup }} &rarr; {{ trip.dropoff }}</div>
-        <div class="meta-row" style="margin-top: 8px;">
-            <span>{{ trip.timing }}</span>
-            <span class="status-pill">{{ trip.status }}</span>
-        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
 {% else %}
-    <div class="card empty-state">
-        No trips yet — request your first ride to see it here.
+    <div class="card empty-card">
+        <p>No trips available right now.</p>
     </div>
 {% endif %}
 
-<form method="POST" action="{{ url_for('auth.logout') }}" class="logout-form">
-    <button type="submit">Log out</button>
-</form>
+<div class="logout-wrapper">
+    <form action="{{ url_for('auth.logout') }}" method="POST">
+        <button type="submit" class="link-btn">Log out</button>
+    </form>
+</div>
 {% endblock %}

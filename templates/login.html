@@ -1,21 +1,30 @@
 {% extends "base.html" %}
+
 {% block title %}Log in - RideSafe{% endblock %}
+
 {% block content %}
 <div class="card">
     <h2>Welcome back</h2>
     <p class="subtitle">Log in to request or track a ride.</p>
-    {% if error %}<div class="error-msg">{{ error }}</div>{% endif %}
+    
+    {% if error %}
+        <div class="error-msg">{{ error }}</div>
+    {% endif %}
+
     <form method="POST">
         <div class="field">
-            <label>Username</label>
-            <input type="text" name="username" required autofocus>
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required autofocus autocomplete="username">
         </div>
         <div class="field">
-            <label>Password</label>
-            <input type="password" name="password" required>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required autocomplete="current-password">
         </div>
         <button type="submit" class="btn btn-primary">Log in</button>
     </form>
-    <div class="link-row">No account yet? <a href="{{ url_for('auth.register') }}">Register</a></div>
+
+    <div class="link-row">
+        No account yet? <a href="{{ url_for('auth.register') }}">Register</a>
+    </div>
 </div>
 {% endblock %}

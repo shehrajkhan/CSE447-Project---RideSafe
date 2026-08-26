@@ -1,24 +1,141 @@
 {% extends "base.html" %}
 {% block title %}Request a ride - RideSafe{% endblock %}
 {% block content %}
+<style>
+    /* Styling for custom autocomplete suggestions */
+    .autocomplete-wrapper {
+        position: relative;
+    }
+    .suggestions-list {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 0 0 6px 6px;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 1000;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        display: none;
+    }
+    .suggestion-item {
+        padding: 10px 14px;
+        cursor: pointer;
+        font-size: 0.95rem;
+        color: #333;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .suggestion-item:hover {
+        background-color: #f5f5f5;
+        color: #000;
+    }
+</style>
+
 <div class="card">
     <h2>Where to?</h2>
-    <p class="subtitle">Trip details are encrypted before they leave your session.</p>
+    <p class="subtitle">All your Trip details are protected.</p>
     <form method="POST">
-        <div class="field">
-            <label>Pickup location</label>
-            <input type="text" name="pickup" required autofocus>
+        <!-- Pickup location text input -->
+        <div class="field autocomplete-wrapper">
+            <label for="pickup">Pickup location</label>
+            <input 
+                type="text" 
+                id="pickup"
+                name="pickup" 
+                placeholder="Type location (e.g. Gulshan, DU, Airport...)" 
+                required 
+                autofocus
+                autocomplete="off"
+            >
+            <div id="pickup-suggestions" class="suggestions-list"></div>
         </div>
-        <div class="field">
-            <label>Drop-off location</label>
-            <input type="text" name="dropoff" required>
+
+        <!-- Drop-off location text input -->
+        <div class="field autocomplete-wrapper">
+            <label for="dropoff">Drop-off location</label>
+            <input 
+                type="text" 
+                id="dropoff"
+                name="dropoff" 
+                placeholder="Type location (e.g. Gulshan, DU, Airport...)" 
+                required
+                autocomplete="off"
+            >
+            <div id="dropoff-suggestions" class="suggestions-list"></div>
         </div>
+
+        <!-- Pickup time dropdown selection -->
         <div class="field">
-            <label>Time</label>
-            <input type="text" name="timing" placeholder="e.g. Today, 5:30 PM" required>
+            <label for="timing">Pickup time</label>
+            <select name="timing" id="timing" required>
+                <option value="Now" selected>Leave Now (ASAP)</option>
+                <option value="In 10 minutes">In 10 minutes</option>
+                <option value="In 15 minutes">In 15 minutes</option>
+                <option value="In 30 minutes">In 30 minutes</option>
+                <option value="In 1 hour">In 1 hour</option>
+            </select>
         </div>
+
         <button type="submit" class="btn btn-primary">Request ride</button>
     </form>
-    <div class="link-row"><a href="{{ url_for('trips.dashboard') }}">Back to dashboard</a></div>
+    <div class="link-row">
+        <a href="{{ url_for('trips.dashboard') }}">Back to dashboard</a>
+    </div>
 </div>
+
+<script>
+    // Pass Python array safely to JS
+    const locations = {{ saved_locations | tojson }};
+
+    function setupAutocomplete(inputId, suggestionsId) {
+        const input = document.getElementById(inputId);
+        const container = document.getElementById(suggestionsId);
+
+        input.addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+            container.innerHTML = '';
+
+            if (!query) {
+                container.style.display = 'none';
+                return;
+            }
+
+            // Filter locations based on what user has typed so far
+            const matches = locations.filter(loc => loc.toLowerCase().includes(query));
+
+            if (matches.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+
+            // Render matching item suggestions
+            matches.forEach(loc => {
+                const item = document.createElement('div');
+                item.className = 'suggestion-item';
+                item.textContent = loc;
+                
+                item.addEventListener('click', function() {
+                    input.value = loc;
+                    container.style.display = 'none';
+                });
+
+                container.appendChild(item);
+            });
+
+            container.style.display = 'block';
+        });
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target !== input && !container.contains(e.target)) {
+                container.style.display = 'none';
+            }
+        });
+    }
+
+    setupAutocomplete('pickup', 'pickup-suggestions');
+    setupAutocomplete('dropoff', 'dropoff-suggestions');
+</script>
 {% endblock %}
