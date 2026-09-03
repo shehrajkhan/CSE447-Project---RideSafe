@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Admin Panel - RideSafe{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 440px; margin: 20px auto; border-top: 4px solid #1E293B;">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <i class="fa-solid fa-user-shield" style="font-size: 2.4rem; color: #1E293B; margin-bottom: 8px;"></i>
+        <h2 style="margin: 0; font-size: 1.5rem; color: #0F172A;">Admin Panel</h2>
+        <p class="subtitle" style="margin-top: 4px;">Platform Management & Governance Interface</p>
+    </div>
+
+    {% if error %}
+        <div class="error-msg">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('admin.admin_login') }}">
+        <div class="field">
+            <label for="admin-username">Admin Username</label>
+            <input type="text" id="admin-username" name="username" placeholder="e.g. admin" required autofocus autocomplete="username">
+        </div>
+        <div class="field">
+            <label for="admin-password">Admin Password</label>
+            <input type="password" id="admin-password" name="password" required autocomplete="current-password">
+        </div>
+
+        <div class="field" style="display: flex; align-items: center; gap: 8px; margin-top: 12px;">
+            <input type="checkbox" id="action" name="action" value="register_admin" style="width: auto;">
+            <label for="action" style="margin: 0; font-size: 0.85rem; font-weight: normal; color: #475569; cursor: pointer;">
+                Initialize new Admin account if not registered
+            </label>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="background: #1E293B; border-color: #1E293B; margin-top: 16px;">
+            <i class="fa-solid fa-right-to-bracket"></i> Log In to Admin Panel
+        </button>
+    </form>
+
+    <div class="link-row" style="margin-top: 20px; text-align: center;">
+        Standard User? <a href="{{ url_for('auth.login') }}">User Login</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}RideSafe{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="topbar">
+        <a href="{{ url_for('trips.dashboard') }}" class="brand-link">
+            <svg class="lock-glyph" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="7" width="10" height="7" rx="2" stroke="white" stroke-width="1.4"/>
+                <path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="white" stroke-width="1.4"/>
+            </svg>
+            RideSafe
+        </a>
+
+        {% if g.user_id %}
+            <div class="topbar-nav">
+                {% if g.user_role == 'admin' %}
+                    <a href="{{ url_for('admin.dashboard') }}" class="nav-link">
+                        <i class="fa-solid fa-user-shield"></i> Admin Control Center
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('trips.dashboard') }}" class="nav-link">
+                        <i class="fa-solid fa-gauge"></i> Dashboard
+                    </a>
+                {% endif %}
+                <a href="{{ url_for('profile.view_profile') }}" class="nav-link">
+                    <i class="fa-solid fa-user"></i> Profile
+                </a>
+
+
+
+                {% if g.user_role == 'rider' %}
+                    <a href="{{ url_for('trips.request_ride') }}" class="nav-link">
+                        <i class="fa-solid fa-plus"></i> Request Ride
+                    </a>
+                {% endif %}
+                <div class="topbar-user">
+                    <span class="role-badge">{{ g.user_role }}</span>
+                    <form action="{{ url_for('auth.logout') }}" method="POST" style="margin: 0;">
+                        <button type="submit" class="topbar-logout-btn">Log out</button>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+
+    </header>
+
+
+    <main class="{% block main_class %}{% endblock %}">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

@@ -1,0 +1,416 @@
+/* ============================================================
+   RideSafe Design System
+   Palette: Deep Navy Ink + Electric Coral
+   Type: Space Grotesk (display) / IBM Plex Sans (body) / IBM Plex Mono (labels)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+:root {
+  --ink: #10243E;
+  --ink-soft: #1E3A5F;
+  --paper: #FFFFFF;
+  --paper-card: #FFFFFF;
+  --coral: #FF5D73;
+  --coral-dark: #E8465D;
+  --line: #E2E8F0;
+  --text: #16233A;
+  --text-muted: #6B7686;
+
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'IBM Plex Sans', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  --radius: 18px;
+  --shadow-card: 0 16px 40px -8px rgba(16, 36, 62, 0.12), 0 4px 12px rgba(16, 36, 62, 0.04);
+}
+
+* { 
+  box-sizing: border-box; 
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--paper);
+  background-image: url('../images/bg-city.png');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  background-attachment: fixed;
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Semi-transparent white overlay so text and cards remain readable over line art */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.45);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ---- Top bar ---- */
+header.topbar {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  background: var(--ink);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 16px rgba(16, 36, 62, 0.15);
+}
+
+header.topbar a.brand-link {
+  color: white;
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.3rem;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+header.topbar .lock-glyph {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* ---- Page Shell ---- */
+main {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 440px;
+  margin: 0px auto;
+  padding: 0 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+main.wide {
+  max-width: 760px;
+}
+
+/* ---- Card ---- */
+.card {
+  background: var(--paper-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-card);
+  padding: 40px 36px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.6rem;
+  margin: 0 0 6px 0;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  margin: 0 0 28px 0;
+}
+
+/* ---- Forms ---- */
+.field {
+  margin-bottom: 20px;
+}
+
+.field label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  padding: 13px 15px;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  background: #FAFAFC;
+  color: var(--text);
+  transition: all 0.15s ease;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: none;
+  background: #FFFFFF;
+  border-color: var(--coral);
+  box-shadow: 0 0 0 4px rgba(255, 93, 115, 0.12);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 12px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.btn-primary {
+  background: var(--ink);
+  color: white;
+  box-shadow: 0 4px 14px rgba(16, 36, 62, 0.25);
+}
+
+.btn-primary:hover {
+  background: var(--ink-soft);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(16, 36, 62, 0.35);
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--ink);
+  border: 1.5px solid var(--line);
+}
+
+.btn-secondary:hover {
+  border-color: var(--ink);
+  background: var(--paper);
+}
+
+.link-row {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.link-row a {
+  color: var(--coral-dark);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.link-row a:hover {
+  text-decoration: underline;
+}
+
+.error-msg {
+  background: #FFF1F2;
+  color: var(--coral-dark);
+  border: 1px solid #FECDD3;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 0.88rem;
+  margin-bottom: 20px;
+}
+
+/* ---- Dashboard Specific Styles ---- */
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.btn-sm {
+  width: auto;
+  padding: 10px 20px;
+  border-radius: 20px;
+}
+
+.trip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.trip-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 28px;
+}
+
+.trip-route {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.05rem;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+
+.route-dots {
+  display: inline-block;
+  width: 24px;
+  height: 8px;
+  background: radial-gradient(circle at 4px 4px, var(--coral) 3px, transparent 4px),
+              radial-gradient(circle at 20px 4px, var(--ink) 3px, transparent 4px);
+}
+
+.trip-meta {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 12px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.badge-requested {
+  background: #EFF6FF;
+  color: #1D4ED8;
+}
+
+.badge-accepted {
+  background: #FEF3C7;
+  color: #B45309;
+}
+
+.badge-arrived {
+  background: #E0E7FF;
+  color: #4338CA;
+}
+
+.badge-in_progress {
+  background: #FCE7F3;
+  color: #BE185D;
+}
+
+.badge-completed {
+  background: #E6F4EA;
+  color: #137333;
+}
+
+.btn-chat {
+  background: #2563EB;
+  color: white !important;
+  border: none;
+  font-size: 0.85rem;
+  padding: 6px 14px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+  transition: all 0.15s ease;
+}
+
+.btn-chat:hover {
+  background: #1D4ED8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+}
+
+.topbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.topbar-nav .nav-link {
+  color: #94A3B8;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+
+.topbar-nav .nav-link:hover,
+.topbar-nav .nav-link.active {
+  color: white;
+}
+
+.topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.role-badge {
+  background: rgba(255, 255, 255, 0.12);
+  color: #F1F5F9;
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.topbar-logout-btn {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #CBD5E1;
+  font-size: 0.8rem;
+  padding: 5px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.topbar-logout-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.logout-wrapper {
+  margin-top: 24px;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+.link-btn:hover {
+  color: var(--ink);
+}

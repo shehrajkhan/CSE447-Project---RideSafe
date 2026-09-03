@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard - RideSafe{% endblock %}
+{% block main_class %}wide{% endblock %}
+
+{% block content %}
+<div style="max-width: 1050px; margin: 20px auto;">
+    <!-- Top Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div>
+            <h2 style="margin: 0; font-size: 1.6rem; color: #0F172A; display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-user-shield" style="color: #1E293B;"></i> Admin Control Center
+            </h2>
+            <p style="margin: 4px 0 0 0; color: #64748B; font-size: 0.92rem;">Uber-style Governance, Account Suspension & Advertisement Management</p>
+        </div>
+        <span class="role-badge" style="background: #1E293B; color: #FFFFFF; font-size: 0.85rem; padding: 6px 14px;">ADMINISTRATOR</span>
+    </div>
+
+    <!-- Security & RBAC Boundary Banner -->
+    <div style="background: #F8FAFC; border: 1px solid #CBD5E1; padding: 14px 18px; border-radius: 8px; font-size: 0.88rem; color: #334155; margin-bottom: 24px; display: flex; align-items: center; gap: 12px;">
+        <i class="fa-solid fa-shield-halved" style="font-size: 1.4rem; color: #2563EB;"></i>
+        <div>
+            <strong>RBAC & Zero-Knowledge Boundary Enforced:</strong> Administrators can manage user account statuses, publish platform blogs/ads, view metrics, and oversee trip workflows. Asymmetric encryption guarantees private profile and trip details remain completely unreadable to admin without user key material.
+        </div>
+    </div>
+
+    <!-- Stats Cards Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px;">
+        <div class="card" style="margin: 0; padding: 18px;">
+            <div style="font-size: 0.8rem; font-weight: 600; color: #64748B; text-transform: uppercase;">Total Users</div>
+            <div style="font-size: 1.8rem; font-weight: 700; color: #0F172A; margin-top: 6px;">{{ stats.total_users }}</div>
+        </div>
+
+        <div class="card" style="margin: 0; padding: 18px;">
+            <div style="font-size: 0.8rem; font-weight: 600; color: #64748B; text-transform: uppercase;">Active Riders</div>
+            <div style="font-size: 1.8rem; font-weight: 700; color: #2563EB; margin-top: 6px;">{{ stats.total_riders }}</div>
+        </div>
+
+        <div class="card" style="margin: 0; padding: 18px;">
+            <div style="font-size: 0.8rem; font-weight: 600; color: #64748B; text-transform: uppercase;">Active Drivers</div>
+            <div style="font-size: 1.8rem; font-weight: 700; color: #059669; margin-top: 6px;">{{ stats.total_drivers }}</div>
+        </div>
+
+        <div class="card" style="margin: 0; padding: 18px;">
+            <div style="font-size: 0.8rem; font-weight: 600; color: #64748B; text-transform: uppercase;">Total Trips</div>
+            <div style="font-size: 1.8rem; font-weight: 700; color: #D97706; margin-top: 6px;">{{ stats.total_trips }}</div>
+        </div>
+    </div>
+
+    <!-- Blog & Advertisement Management Section -->
+    <div class="card" style="margin: 0 0 28px 0; padding: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="margin: 0; font-size: 1.2rem; color: #0F172A; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-bullhorn" style="color: #2563EB;"></i> Advertisements & Blogs Governance
+            </h3>
+            <button type="button" class="btn btn-primary btn-sm" onclick="toggleAdminForm('create-blog-form')">
+                + Create New Blog/Ad
+            </button>
+        </div>
+
+        <!-- Create Blog Form (Toggleable) -->
+        <div id="create-blog-form" style="display: none; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 18px; margin-bottom: 20px;">
+            <h4 style="margin: 0 0 14px 0; color: #0F172A; font-size: 1rem;">Publish New Advertisement or Announcement</h4>
+            <form method="POST" action="{{ url_for('admin.create_blog') }}">
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 14px; margin-bottom: 12px;">
+                    <div>
+                        <label style="display: block; font-size: 0.82rem; font-weight: 600; color: #475569; margin-bottom: 4px;">Title</label>
+                        <input type="text" name="title" required placeholder="e.g. 20% OFF Weekend Rides" style="width: 100%; padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 6px; box-sizing: border-box;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.82rem; font-weight: 600; color: #475569; margin-bottom: 4px;">Category Badge</label>
+                        <select name="category" style="width: 100%; padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 6px; box-sizing: border-box;">
+                            <option value="PROMO">PROMO</option>
+                            <option value="SAFETY">SAFETY</option>
+                            <option value="UPDATE">UPDATE</option>
+                            <option value="NEWS">NEWS</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-size: 0.82rem; font-weight: 600; color: #475569; margin-bottom: 4px;">Image Cover URL</label>
+                    <input type="url" name="image_url" placeholder="https://images.unsplash.com/photo-..." style="width: 100%; padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 6px; box-sizing: border-box;">
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 0.82rem; font-weight: 600; color: #475569; margin-bottom: 4px;">Content / Description</label>
+                    <textarea name="content" rows="3" required placeholder="Enter full announcement details..." style="width: 100%; padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 6px; box-sizing: border-box; font-family: inherit;"></textarea>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="toggleAdminForm('create-blog-form')">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Publish Post</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Existing Blogs List Table -->
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.92rem;">
+                <thead>
+                    <tr style="background: #F1F5F9; border-bottom: 2px solid #E2E8F0; color: #475569;">
+                        <th style="padding: 10px 14px;">Cover</th>
+                        <th style="padding: 10px 14px;">Title & Category</th>
+                        <th style="padding: 10px 14px;">Published Date</th>
+                        <th style="padding: 10px 14px; text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if not blogs %}
+                        <tr>
+                            <td colspan="4" style="padding: 16px; text-align: center; color: #94A3B8;">No blogs or advertisements uploaded yet.</td>
+                        </tr>
+                    {% endif %}
+                    {% for b in blogs %}
+                        <tr style="border-bottom: 1px solid #E2E8F0;">
+                            <td style="padding: 10px 14px; width: 60px;">
+                                {% if b.image_url %}
+                                    <img src="{{ b.image_url }}" alt="Cover" style="width: 48px; height: 36px; object-fit: cover; border-radius: 4px;">
+                                {% else %}
+                                    <div style="width: 48px; height: 36px; background: #E2E8F0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: #64748B;">No img</div>
+                                {% endif %}
+                            </td>
+                            <td style="padding: 10px 14px;">
+                                <div style="font-weight: 600; color: #0F172A;">{{ b.title }}</div>
+                                <span class="badge" style="font-size: 0.7rem; background: #2563EB; color: #FFF; padding: 1px 6px; border-radius: 4px; margin-top: 2px; display: inline-block;">
+                                    {{ b.category }}
+                                </span>
+                            </td>
+                            <td style="padding: 10px 14px; color: #64748B;">{{ b.created_at }}</td>
+                            <td style="padding: 10px 14px; text-align: right;">
+                                <form method="POST" action="{{ url_for('admin.delete_blog', blog_id=b.id) }}" style="display: inline;" onsubmit="return confirm('Delete this blog post?');">
+                                    <button type="submit" class="btn btn-sm" style="background: #DC2626; color: #FFF; border: none; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- User Account Management Section -->
+    <div class="card" style="margin: 0 0 28px 0; padding: 20px;">
+        <h3 style="margin: 0 0 16px 0; font-size: 1.2rem; color: #0F172A; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-users-gear" style="color: #475569;"></i> User Accounts & RBAC Controls
+        </h3>
+
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.92rem;">
+                <thead>
+                    <tr style="background: #F1F5F9; border-bottom: 2px solid #E2E8F0; color: #475569;">
+                        <th style="padding: 10px 14px;">Username</th>
+                        <th style="padding: 10px 14px;">Role</th>
+                        <th style="padding: 10px 14px;">Status</th>
+                        <th style="padding: 10px 14px;">Registered</th>
+                        <th style="padding: 10px 14px; text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users %}
+                        <tr style="border-bottom: 1px solid #E2E8F0;">
+                            <td style="padding: 12px 14px; font-weight: 600; color: #0F172A;">{{ u.username }}</td>
+                            <td style="padding: 12px 14px;">
+                                <span class="role-badge" style="font-size: 0.75rem; background: {% if u.role == 'admin' %}#1E293B{% elif u.role == 'driver' %}#059669{% else %}#2563EB{% endif %}; color: #FFF;">
+                                    {{ u.role|upper }}
+                                </span>
+                            </td>
+                            <td style="padding: 12px 14px;">
+                                {% if u.status == 'active' %}
+                                    <span style="background: #DCFCE7; color: #166534; font-size: 0.78rem; font-weight: 600; padding: 2px 8px; border-radius: 12px;">ACTIVE</span>
+                                {% else %}
+                                    <span style="background: #FEE2E2; color: #991B1B; font-size: 0.78rem; font-weight: 600; padding: 2px 8px; border-radius: 12px;">SUSPENDED</span>
+                                {% endif %}
+                            </td>
+                            <td style="padding: 12px 14px; color: #64748B;">{{ u.created_at }}</td>
+                            <td style="padding: 12px 14px; text-align: right;">
+                                {% if u.role != 'admin' %}
+                                    <form method="POST" action="{{ url_for('admin.toggle_user_status', user_id=u.id) }}" style="display: inline;">
+                                        {% if u.status == 'active' %}
+                                            <button type="submit" class="btn btn-sm" style="background: #DC2626; color: #FFF; border: none; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">
+                                                Suspend
+                                            </button>
+                                        {% else %}
+                                            <button type="submit" class="btn btn-sm" style="background: #16A34A; color: #FFF; border: none; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">
+                                                Reactivate
+                                            </button>
+                                        {% endif %}
+                                    </form>
+                                {% else %}
+                                    <span style="font-size: 0.8rem; color: #94A3B8;">Protected</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Platform Trips Overview Section -->
+    <div class="card" style="margin: 0; padding: 20px;">
+        <h3 style="margin: 0 0 16px 0; font-size: 1.2rem; color: #0F172A; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-route" style="color: #475569;"></i> Platform Trips & Activity Overview
+        </h3>
+
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.92rem;">
+                <thead>
+                    <tr style="background: #F1F5F9; border-bottom: 2px solid #E2E8F0; color: #475569;">
+                        <th style="padding: 10px 14px;">Trip ID</th>
+                        <th style="padding: 10px 14px;">Rider</th>
+                        <th style="padding: 10px 14px;">Driver</th>
+                        <th style="padding: 10px 14px;">Status</th>
+                        <th style="padding: 10px 14px;">Requested At</th>
+                        <th style="padding: 10px 14px; text-align: right;">Encrypted Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if not trips %}
+                        <tr>
+                            <td colspan="6" style="padding: 16px; text-align: center; color: #94A3B8;">No trip requests recorded on platform yet.</td>
+                        </tr>
+                    {% endif %}
+                    {% for t in trips %}
+                        <tr style="border-bottom: 1px solid #E2E8F0;">
+                            <td style="padding: 12px 14px; font-family: monospace; font-size: 0.85rem; color: #475569;">#{{ t.id[:8] }}</td>
+                            <td style="padding: 12px 14px; font-weight: 500; color: #0F172A;">{{ t.rider }}</td>
+                            <td style="padding: 12px 14px; color: #334155;">{{ t.driver }}</td>
+                            <td style="padding: 12px 14px;">
+                                <span class="badge badge-{{ t.status|lower }}">
+                                    {{ t.status|replace('_', ' ')|upper }}
+                                </span>
+                            </td>
+                            <td style="padding: 12px 14px; color: #64748B;">{{ t.created_at }}</td>
+                            <td style="padding: 12px 14px; text-align: right;">
+                                <span style="font-size: 0.78rem; background: #EEF2FF; color: #4338CA; padding: 3px 8px; border-radius: 4px; font-weight: 500;">
+                                    🔒 ECC Encrypted
+                                </span>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleAdminForm(formId) {
+    const el = document.getElementById(formId);
+    if (el) {
+        el.style.display = (el.style.display === 'none' || el.style.display === '') ? 'block' : 'none';
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,336 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - RideSafe{% endblock %}
+{% block main_class %}wide{% endblock %}
+
+{% block content %}
+
+<!-- Uber-style 4 Box Vehicle Selector (Above Your Trips) -->
+<div class="uber-services-container" style="margin-bottom: 32px;">
+    <h3 style="font-size: 1.15rem; font-weight: 700; color: #0F172A; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+        <i class="fa-solid fa-layer-group" style="color: #2563EB;"></i> RideSafe Services
+    </h3>
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+        <!-- Box 1: Bike -->
+        <a href="{% if user_role == 'rider' %}{{ url_for('trips.request_ride') }}{% else %}#{% endif %}" 
+           class="uber-service-card"
+           style="background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); border: 1.5px solid #BFDBFE; border-radius: 14px; padding: 20px; text-decoration: none; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s ease-in-out; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08); position: relative; overflow: hidden;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h4 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: #1E3A8A;">Bike</h4>
+                    <p style="margin: 4px 0 0 0; font-size: 0.82rem; color: #3B82F6; font-weight: 500;">Fast & Affordable</p>
+                </div>
+                <div style="background: #FFFFFF; width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.06);">
+                    <i class="fa-solid fa-motorcycle" style="font-size: 1.6rem; color: #2563EB;"></i>
+                </div>
+            </div>
+            <div style="margin-top: 16px; display: flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 700; color: #1D4ED8;">
+                <span>Request Bike</span> <i class="fa-solid fa-arrow-right"></i>
+            </div>
+        </a>
+
+        <!-- Box 2: Car -->
+        <a href="{% if user_role == 'rider' %}{{ url_for('trips.request_ride') }}{% else %}#{% endif %}" 
+           class="uber-service-card"
+           style="background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%); border: 1.5px solid #A7F3D0; border-radius: 14px; padding: 20px; text-decoration: none; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s ease-in-out; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.08); position: relative; overflow: hidden;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h4 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: #064E3B;">Car</h4>
+                    <p style="margin: 4px 0 0 0; font-size: 0.82rem; color: #10B981; font-weight: 500;">Comfortable AC Rides</p>
+                </div>
+                <div style="background: #FFFFFF; width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.06);">
+                    <i class="fa-solid fa-car-side" style="font-size: 1.6rem; color: #059669;"></i>
+                </div>
+            </div>
+            <div style="margin-top: 16px; display: flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 700; color: #047857;">
+                <span>Request Car</span> <i class="fa-solid fa-arrow-right"></i>
+            </div>
+        </a>
+
+        <!-- Box 3: CNG -->
+        <a href="{% if user_role == 'rider' %}{{ url_for('trips.request_ride') }}{% else %}#{% endif %}" 
+           class="uber-service-card"
+           style="background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%); border: 1.5px solid #FDE68A; border-radius: 14px; padding: 20px; text-decoration: none; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s ease-in-out; box-shadow: 0 2px 8px rgba(217, 119, 6, 0.08); position: relative; overflow: hidden;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h4 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: #78350F;">CNG</h4>
+                    <p style="margin: 4px 0 0 0; font-size: 0.82rem; color: #F59E0B; font-weight: 500;">Auto-Rickshaw Rides</p>
+                </div>
+                <div style="background: #FFFFFF; width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.06);">
+                    <i class="fa-solid fa-taxi" style="font-size: 1.6rem; color: #D97706;"></i>
+                </div>
+            </div>
+            <div style="margin-top: 16px; display: flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 700; color: #B45309;">
+                <span>Request CNG</span> <i class="fa-solid fa-arrow-right"></i>
+            </div>
+        </a>
+
+        <!-- Box 4: Truck -->
+        <a href="{% if user_role == 'rider' %}{{ url_for('trips.request_ride') }}{% else %}#{% endif %}" 
+           class="uber-service-card"
+           style="background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%); border: 1.5px solid #FCA5A5; border-radius: 14px; padding: 20px; text-decoration: none; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s ease-in-out; box-shadow: 0 2px 8px rgba(220, 38, 38, 0.08); position: relative; overflow: hidden;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h4 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: #7F1D1D;">Truck</h4>
+                    <p style="margin: 4px 0 0 0; font-size: 0.82rem; color: #EF4444; font-weight: 500;">Freight & Parcel Delivery</p>
+                </div>
+                <div style="background: #FFFFFF; width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.06);">
+                    <i class="fa-solid fa-truck" style="font-size: 1.6rem; color: #DC2626;"></i>
+                </div>
+            </div>
+            <div style="margin-top: 16px; display: flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 700; color: #B91C1C;">
+                <span>Request Truck</span> <i class="fa-solid fa-arrow-right"></i>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="dashboard-header">
+    <h2>Your trips</h2>
+    {% if user_role == 'rider' %}
+        <a href="{{ url_for('trips.request_ride') }}" class="btn btn-primary btn-sm">+ Request a ride</a>
+    {% endif %}
+</div>
+
+{% if sos_triggered_id %}
+    <div style="background: #FEF2F2; border: 2px solid #EF4444; border-radius: 10px; padding: 18px; margin-bottom: 24px; color: #991B1B; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15);">
+        <div style="font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.6rem; color: #DC2626;"></i> 🚨 EMERGENCY SOS TRIGGERED!
+        </div>
+        <p style="margin: 8px 0 14px 0; font-size: 0.92rem; color: #7F1D1D;">
+            Emergency SOS protocol activated for trip <strong>#{{ sos_triggered_id[:8] }}</strong>. Law enforcement (999) and RideSafe Safety Team have been dispatched to your encrypted GPS coordinates.
+        </p>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <a href="tel:999" class="btn btn-sm" style="background: #DC2626; color: #FFFFFF; font-weight: 700; text-decoration: none; padding: 8px 16px; border-radius: 6px;">
+                <i class="fa-solid fa-phone-volume"></i> Call 999 Emergency
+            </a>
+            <a href="tel:01800999999" class="btn btn-sm" style="background: #1E293B; color: #FFFFFF; font-weight: 600; text-decoration: none; padding: 8px 16px; border-radius: 6px;">
+                <i class="fa-solid fa-headset"></i> RideSafe Hotline
+            </a>
+        </div>
+    </div>
+{% endif %}
+
+{% if trips %}
+    <div class="trip-list">
+        {% for trip in trips %}
+            <div class="card trip-card" style="margin-bottom: 20px;">
+                <div class="trip-info">
+                    <div class="trip-route">
+                        <span class="route-dots"></span>
+                        <strong class="route-text">{{ trip.pickup }} &rarr; {{ trip.dropoff }}</strong>
+                    </div>
+                    <div class="trip-meta">
+                        <span class="trip-time"><i class="fa-solid fa-clock" style="color: #64748B;"></i> {{ trip.timing }}</span>
+                    </div>
+                </div>
+
+                <div class="trip-action-status" style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                    <!-- Status Badge + Action Buttons Container -->
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end;">
+                        <!-- Status Badge -->
+                        <span class="badge badge-{{ trip.status|lower }}">
+                            {{ trip.status|replace('_', ' ')|upper }}
+                        </span>
+
+                        <!-- Encrypted Chat Button -->
+                        <a href="{{ url_for('chat.room', trip_id=trip.id) }}" 
+                           class="btn-chat" 
+                           title="Open End-to-End Encrypted Chat">
+                            <i class="fa-solid fa-comments"></i> Chat
+                        </a>
+
+                        <!-- See Details Toggle Button (Beside Chat) -->
+                        {% if trip.driver_details or trip.rider_details %}
+                            <button type="button" 
+                                    class="btn-chat" 
+                                    style="background: #2563EB; color: #FFFFFF; cursor: pointer; border: none;"
+                                    onclick="toggleDetails('details-{{ trip.id }}')">
+                                <i class="fa-solid fa-circle-info"></i> See Details
+                            </button>
+                        {% endif %}
+
+                        <!-- Emergency SOS Button (For Rider on Active Trip) -->
+                        {% if user_role == 'rider' and trip.status in ['accepted', 'arrived', 'in_progress'] %}
+                            <form action="{{ url_for('trips.trigger_sos', trip_id=trip.id) }}" method="POST" style="margin: 0;">
+                                <button type="submit" 
+                                        onclick="return confirm('⚠️ Are you sure you want to trigger Emergency SOS? Emergency contacts and 999 will be alerted.');" 
+                                        style="background: #DC2626; color: #FFFFFF; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(220, 38, 38, 0.3);">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> 🚨 Emergency SOS
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+
+                    <!-- Driver Interaction Controls -->
+                    {% if user_role == 'driver' %}
+                        <div class="driver-actions" style="margin-top: 5px;">
+                            {% if trip.status == 'requested' %}
+                                <form action="{{ url_for('trips.accept_ride', trip_id=trip.id) }}" method="POST">
+                                    <button type="submit" class="btn btn-primary btn-sm">Accept Ride</button>
+                                </form>
+                            {% elif trip.status == 'accepted' and trip.driver_id == g.user_id %}
+                                <form action="{{ url_for('trips.update_status', trip_id=trip.id) }}" method="POST">
+                                    <input type="hidden" name="status" value="arrived">
+                                    <button type="submit" class="btn btn-secondary btn-sm">Mark Arrived</button>
+                                </form>
+                            {% elif trip.status == 'arrived' and trip.driver_id == g.user_id %}
+                                <form action="{{ url_for('trips.update_status', trip_id=trip.id) }}" method="POST">
+                                    <input type="hidden" name="status" value="in_progress">
+                                    <button type="submit" class="btn btn-primary btn-sm">Start Ride</button>
+                                </form>
+                            {% elif trip.status == 'in_progress' and trip.driver_id == g.user_id %}
+                                <form action="{{ url_for('trips.update_status', trip_id=trip.id) }}" method="POST">
+                                    <input type="hidden" name="status" value="completed">
+                                    <button type="submit" class="btn btn-secondary btn-sm">Complete Ride</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Driver Details Bar (Toggleable, Hidden by Default) -->
+                {% if user_role == 'rider' and trip.driver_details %}
+                    <div id="details-{{ trip.id }}" style="display: none; width: 100%; margin-top: 16px; background: #F0F9FF; border: 1px solid #BAE6FD; border-radius: 8px; padding: 14px 16px; box-sizing: border-box;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span style="font-weight: 700; color: #0369A1; font-size: 0.92rem; display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-id-card-clip" style="color: #0284C7;"></i> Assigned Driver Information
+                            </span>
+                            <span class="role-badge" style="background: #0284C7; color: #FFFFFF; font-size: 0.72rem; padding: 3px 8px;">DRIVER VERIFIED</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; font-size: 0.88rem;">
+                            <div>
+                                <div style="color: #64748B; font-size: 0.76rem; font-weight: 600; text-transform: uppercase;">Driver Name</div>
+                                <div style="font-weight: 600; color: #0F172A; margin-top: 2px;">
+                                    <i class="fa-solid fa-user-gear" style="color: #0284C7;"></i> {{ trip.driver_details.name }}
+                                </div>
+                            </div>
+                            <div>
+                                <div style="color: #64748B; font-size: 0.76rem; font-weight: 600; text-transform: uppercase;">Contact Number</div>
+                                <div style="margin-top: 2px;">
+                                    <a href="tel:{{ trip.driver_details.phone }}" style="color: #2563EB; font-weight: 600; text-decoration: none;">
+                                        <i class="fa-solid fa-phone" style="color: #16A34A;"></i> {{ trip.driver_details.phone }}
+                                    </a>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="color: #64748B; font-size: 0.76rem; font-weight: 600; text-transform: uppercase;">Vehicle & License Plate</div>
+                                <div style="font-weight: 600; color: #0F172A; margin-top: 2px;">
+                                    <i class="fa-solid fa-car-side" style="color: #0284C7;"></i> {{ trip.driver_details.vehicle_info }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Rider Details Bar (Toggleable, Hidden by Default) -->
+                {% if user_role == 'driver' and trip.rider_details %}
+                    <div id="details-{{ trip.id }}" style="display: none; width: 100%; margin-top: 16px; background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 8px; padding: 14px 16px; box-sizing: border-box;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span style="font-weight: 700; color: #047857; font-size: 0.92rem; display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-user-check" style="color: #059669;"></i> Passenger Rider Information
+                            </span>
+                            <span class="role-badge" style="background: #059669; color: #FFFFFF; font-size: 0.72rem; padding: 3px 8px;">RIDER PASSENGER</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; font-size: 0.88rem;">
+                            <div>
+                                <div style="color: #64748B; font-size: 0.76rem; font-weight: 600; text-transform: uppercase;">Rider Name</div>
+                                <div style="font-weight: 600; color: #0F172A; margin-top: 2px;">
+                                    <i class="fa-solid fa-user" style="color: #059669;"></i> {{ trip.rider_details.name }}
+                                </div>
+                            </div>
+                            <div>
+                                <div style="color: #64748B; font-size: 0.76rem; font-weight: 600; text-transform: uppercase;">Contact Number</div>
+                                <div style="margin-top: 2px;">
+                                    <a href="tel:{{ trip.rider_details.phone }}" style="color: #2563EB; font-weight: 600; text-decoration: none;">
+                                        <i class="fa-solid fa-phone" style="color: #16A34A;"></i> {{ trip.rider_details.phone }}
+                                    </a>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="color: #64748B; font-size: 0.76rem; font-weight: 600; text-transform: uppercase;">Pickup Spot</div>
+                                <div style="font-weight: 600; color: #0F172A; margin-top: 2px;">
+                                    <i class="fa-solid fa-location-dot" style="color: #DC2626;"></i> {{ trip.pickup }}
+                                </div>
+                            </div>
+                            <div>
+                                <div style="color: #64748B; font-size: 0.76rem; font-weight: 600; text-transform: uppercase;">Destination Spot</div>
+                                <div style="font-weight: 600; color: #0F172A; margin-top: 2px;">
+                                    <i class="fa-solid fa-flag-checkered" style="color: #16A34A;"></i> {{ trip.dropoff }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card empty-card">
+        <p>No trips available right now.</p>
+    </div>
+{% endif %}
+
+<!-- Advertisements & Blog Section (Under Your Trips) -->
+<div class="blogs-ads-container" style="margin-top: 45px; margin-bottom: 30px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="font-size: 1.2rem; font-weight: 800; color: #0F172A; margin: 0; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-bullhorn" style="color: #2563EB;"></i> Special Offers & Announcements
+        </h3>
+        <span style="font-size: 0.85rem; color: #64748B; font-weight: 600;">Stay updated with RideSafe</span>
+    </div>
+
+    {% if blogs %}
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+            {% for blog in blogs %}
+                <div class="card blog-card" style="padding: 0; overflow: hidden; border-radius: 12px; border: 1px solid #E2E8F0; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between; background: #FFFFFF;">
+                    <div>
+                        <div style="height: 160px; overflow: hidden; position: relative;">
+                            <img src="{{ blog.image_url }}" alt="{{ blog.title }}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease;">
+                            <span class="badge" style="position: absolute; top: 12px; right: 12px; background: rgba(15, 23, 42, 0.85); color: #FFFFFF; backdrop-filter: blur(4px); font-size: 0.72rem; padding: 4px 10px; border-radius: 20px; font-weight: 700;">
+                                {{ blog.category }}
+                            </span>
+                        </div>
+                        <div style="padding: 16px;">
+                            <h4 style="margin: 0 0 8px 0; font-size: 1.05rem; font-weight: 700; color: #0F172A; line-height: 1.4;">
+                                {{ blog.title }}
+                            </h4>
+                            <p style="margin: 0; font-size: 0.88rem; color: #475569; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                                {{ blog.content }}
+                            </p>
+                        </div>
+                    </div>
+                    <div style="padding: 12px 16px; background: #F8FAFC; border-top: 1px solid #F1F5F9; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: #64748B;">
+                        <span><i class="fa-regular fa-calendar" style="color: #94A3B8;"></i> {{ blog.created_at }}</span>
+                        <a href="javascript:void(0);" onclick="alert('{{ blog.title }}\n\n{{ blog.content }}')" style="color: #2563EB; font-weight: 700; text-decoration: none;">Learn More &rarr;</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card empty-card" style="text-align: center; color: #64748B;">
+            <p>No announcements or promotions active right now.</p>
+        </div>
+    {% endif %}
+</div>
+
+<div class="logout-wrapper">
+    <form action="{{ url_for('auth.logout') }}" method="POST">
+        <button type="submit" class="link-btn">Log out</button>
+    </form>
+</div>
+
+<script>
+function toggleDetails(elementId) {
+    const el = document.getElementById(elementId);
+    if (el) {
+        if (el.style.display === 'none' || el.style.display === '') {
+            el.style.display = 'block';
+        } else {
+            el.style.display = 'none';
+        }
+    }
+}
+</script>
+{% endblock %}

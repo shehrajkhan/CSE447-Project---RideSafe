@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Confirm Key Rotation - RideSafe{% endblock %}
+{% block main_class %}wide{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 550px; margin: 20px auto;">
+    <div style="border-bottom: 1px solid #E2E8F0; padding-bottom: 16px; margin-bottom: 20px;">
+        <h2 style="margin: 0; font-size: 1.4rem; color: #DC2626;">
+            <i class="fa-solid fa-triangle-exclamation"></i> Rotate Keypair
+        </h2>
+        <p style="margin: 4px 0 0 0; font-size: 0.88rem; color: #64748B;">Re-encrypt all user profile and trip records with new RSA & ECC keys.</p>
+    </div>
+
+    {% if error %}
+        <div class="error-msg">{{ error }}</div>
+    {% endif %}
+
+    <div style="background: #FEF2F2; border: 1px solid #FCA5A5; color: #991B1B; padding: 14px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 20px;">
+        <strong>Warning:</strong> This action will generate new RSA & ECC keypairs, re-encrypt all your existing profile and trip data in Supabase, wrap your new private keys using your password, and safely retire your old keypair.
+    </div>
+
+    <form method="POST" action="{{ url_for('keys.rotate_keys') }}">
+        <div class="field">
+            <label>Confirm Your Password</label>
+            <input type="password" name="password" placeholder="Enter your current password to authorize" required autofocus>
+        </div>
+
+        <div style="margin-top: 24px; display: flex; gap: 12px; align-items: center;">
+            <button type="submit" class="btn btn-primary" style="background: #DC2626; border-color: #DC2626;">
+                <i class="fa-solid fa-arrows-rotate"></i> Confirm Key Rotation
+            </button>
+            <a href="{{ url_for('keys.view_keys') }}" class="btn btn-secondary" style="text-decoration: none;">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

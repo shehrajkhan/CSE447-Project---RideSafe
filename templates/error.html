@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Access Error - RideSafe{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 480px; margin: 30px auto; text-align: center;">
+    <div style="font-size: 2.5rem; color: #DC2626; margin-bottom: 12px;">
+        <i class="fa-solid fa-ban"></i>
+    </div>
+    <h2 style="margin: 0; font-size: 1.5rem; color: #0F172A;">Access Denied</h2>
+    <p style="margin: 8px 0 20px 0; color: #64748B; font-size: 0.95rem;">
+        {{ error if error else "You do not have permission to view this resource." }}
+    </p>
+
+    <a href="{{ url_for('trips.dashboard') }}" class="btn btn-primary">Return to Dashboard</a>
+</div>
+{% endblock %}

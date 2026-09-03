@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}User Profile - RideSafe{% endblock %}
+{% block main_class %}wide{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 20px auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E2E8F0; padding-bottom: 16px; margin-bottom: 20px;">
+        <h2 style="margin: 0; font-size: 1.4rem;">User Profile</h2>
+        <span class="role-badge" style="background: #1E293B; color: #F8FAFC;">{{ profile.role|upper }}</span>
+    </div>
+
+    {% if error %}
+        <div class="error-msg">{{ error }}</div>
+    {% endif %}
+
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div class="profile-field">
+            <label style="font-size: 0.8rem; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em;">Username</label>
+            <div style="font-size: 1.05rem; font-weight: 600; color: #0F172A; margin-top: 4px;">{{ profile.username }}</div>
+        </div>
+
+        <div class="profile-field">
+            <label style="font-size: 0.8rem; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em;">Full Name</label>
+            <div style="font-size: 1rem; color: #1E293B; margin-top: 4px;">{{ profile.name }}</div>
+        </div>
+
+        <div class="profile-field">
+            <label style="font-size: 0.8rem; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em;">Email Address (Encrypted)</label>
+            <div style="font-size: 1rem; color: #1E293B; margin-top: 4px;">{{ profile.email }}</div>
+        </div>
+
+        <div class="profile-field">
+            <label style="font-size: 0.8rem; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em;">Phone / Contact</label>
+            <div style="font-size: 1rem; color: #1E293B; margin-top: 4px;">{{ profile.phone }}</div>
+        </div>
+
+        <div class="profile-field">
+            <label style="font-size: 0.8rem; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em;">Address</label>
+            <div style="font-size: 1rem; color: #1E293B; margin-top: 4px;">{{ profile.address }}</div>
+        </div>
+
+        {% if profile.role == 'driver' %}
+            <div class="profile-field" style="background: #F8FAFC; padding: 14px; border-radius: 8px; border: 1px solid #E2E8F0;">
+                <label style="font-size: 0.8rem; font-weight: 600; color: #2563EB; text-transform: uppercase; letter-spacing: 0.05em;">
+                    <i class="fa-solid fa-car"></i> Vehicle Info & License Plate
+                </label>
+                <div style="font-size: 1rem; font-weight: 500; color: #0F172A; margin-top: 6px;">{{ profile.vehicle_info }}</div>
+            </div>
+        {% endif %}
+    </div>
+
+    <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #F1F5F9; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 0.82rem; color: #64748B; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-shield-halved" style="color: #2563EB;"></i> RSA Encrypted Profile
+        </span>
+        <a href="{{ url_for('profile.edit_profile') }}" class="btn btn-primary btn-sm">Edit Profile</a>
+    </div>
+</div>
+{% endblock %}
