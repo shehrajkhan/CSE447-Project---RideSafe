@@ -153,7 +153,6 @@ def login():
     return resp
 
 
-
 @auth_bp.route("/logout", methods=["POST"])
 @require_login
 def logout():
@@ -162,4 +161,3 @@ def logout():
     resp = make_response(redirect(url_for("auth.login")))
     resp.delete_cookie("session_token")
     return resp
-
