@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Email Verification - RideSafe{% endblock %}
+
+{% block content %}
+
+<div class="card" style="max-width: 420px; margin: 40px auto;">
+
+    <h2>Verify Your Login</h2>
+
+    <p class="subtitle">
+        We sent a 6-digit verification code to your
+        registered email address.
+    </p>
+
+    {% if error %}
+        <div class="error-msg">
+            {{ error }}
+        </div>
+    {% endif %}
+
+    {% if not expired %}
+
+        <form method="POST"
+              action="{{ url_for('auth.verify_2fa') }}">
+
+            <div class="field">
+
+                <label for="otp_code">
+                    Verification Code
+                </label>
+
+                <input
+                    type="text"
+                    id="otp_code"
+                    name="otp_code"
+                    inputmode="numeric"
+                    pattern="[0-9]{6}"
+                    maxlength="6"
+                    minlength="6"
+                    autocomplete="one-time-code"
+                    placeholder="Enter 6-digit code"
+                    required
+                    autofocus
+                >
+
+            </div>
+
+            {% if remaining_seconds is not none %}
+
+                <p style="text-align: center; margin: 10px 0;">
+                    Code expires in
+                    <strong>
+                        {{ remaining_seconds }}
+                    </strong>
+                    seconds.
+                </p>
+
+            {% endif %}
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+                style="width: 100%;"
+            >
+                Verify Code
+            </button>
+
+        </form>
+
+    {% else %}
+
+        <div style="text-align: center; margin-top: 20px;">
+
+            <p>
+                Your verification code has expired.
+            </p>
+
+            <a
+                href="{{ url_for('auth.login') }}"
+                class="btn btn-primary"
+            >
+                Return to Login
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

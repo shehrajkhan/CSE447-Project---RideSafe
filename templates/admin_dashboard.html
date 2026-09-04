@@ -46,6 +46,93 @@
         </div>
     </div>
 
+    <!-- Emergency SOS Safety Notices Section -->
+    <div class="card" style="margin: 0 0 28px 0; padding: 20px; border: {% if stats.active_emergencies > 0 %}2px solid #EF4444{% else %}1px solid #E2E8F0{% endif %}; background: {% if stats.active_emergencies > 0 %}#FEF2F2{% else %}#FFFFFF{% endif %};">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="margin: 0; font-size: 1.2rem; color: {% if stats.active_emergencies > 0 %}#991B1B{% else %}#0F172A{% endif %}; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-triangle-exclamation" style="color: #DC2626;"></i> Emergency & Safety Alerts
+            </h3>
+            {% if stats.active_emergencies > 0 %}
+                <span class="badge" style="background: #DC2626; color: #FFFFFF; font-size: 0.8rem; padding: 4px 10px; border-radius: 12px; font-weight: 700;">
+                    🚨 {{ stats.active_emergencies }} ACTIVE EMERGENCY
+                </span>
+            {% else %}
+                <span style="font-size: 0.85rem; color: #16A34A; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                    <i class="fa-solid fa-circle-check"></i> All Clear (No Active Alerts)
+                </span>
+            {% endif %}
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.92rem;">
+                <thead>
+                    <tr style="background: #F1F5F9; border-bottom: 2px solid #E2E8F0; color: #475569;">
+                        <th style="padding: 10px 14px;">Trip ID</th>
+                        <th style="padding: 10px 14px;">Rider</th>
+                        <th style="padding: 10px 14px;">Driver Name & Contact</th>
+                        <th style="padding: 10px 14px;">Vehicle / Car Details</th>
+                        <th style="padding: 10px 14px;">Triggered At</th>
+                        <th style="padding: 10px 14px;">Status</th>
+                        <th style="padding: 10px 14px; text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if not emergencies %}
+                        <tr>
+                            <td colspan="7" style="padding: 16px; text-align: center; color: #94A3B8;">No emergency alerts recorded.</td>
+                        </tr>
+                    {% endif %}
+                    {% for e in emergencies %}
+                        <tr style="border-bottom: 1px solid #E2E8F0; background: {% if e.status == 'active' %}#FFF5F5{% else %}#FFFFFF{% endif %};">
+                            <td style="padding: 12px 14px; font-family: monospace; font-size: 0.85rem; font-weight: 600; color: #0F172A;">
+                                #{{ e.trip_id[:8] }}
+                            </td>
+                            <td style="padding: 12px 14px; font-weight: 600; color: #0F172A;">
+                                <i class="fa-solid fa-user" style="color: #2563EB;"></i> {{ e.rider }}
+                            </td>
+                            <td style="padding: 12px 14px;">
+                                <div style="font-weight: 600; color: #0F172A;">{{ e.driver_name }}</div>
+                                <div style="font-size: 0.82rem; color: #64748B;">
+                                    <i class="fa-solid fa-phone" style="color: #16A34A;"></i> {{ e.driver_phone }}
+                                </div>
+                            </td>
+                            <td style="padding: 12px 14px; font-weight: 600; color: #0F172A;">
+                                <i class="fa-solid fa-car-side" style="color: #059669;"></i> {{ e.driver_vehicle }}
+                            </td>
+                            <td style="padding: 12px 14px; color: #64748B;">
+                                {{ e.created_at }}
+                            </td>
+                            <td style="padding: 12px 14px;">
+                                {% if e.status == 'active' %}
+                                    <span style="background: #FEE2E2; color: #991B1B; font-size: 0.78rem; font-weight: 700; padding: 3px 8px; border-radius: 12px; display: inline-block;">
+                                        🚨 ACTIVE
+                                    </span>
+                                {% else %}
+                                    <span style="background: #DCFCE7; color: #166534; font-size: 0.78rem; font-weight: 600; padding: 3px 8px; border-radius: 12px; display: inline-block;">
+                                        ✓ RESOLVED
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td style="padding: 12px 14px; text-align: right;">
+                                {% if e.status == 'active' %}
+                                    <form method="POST" action="{{ url_for('admin.resolve_emergency', emergency_id=e.id) }}" style="display: inline;">
+                                        <button type="submit" class="btn btn-sm" style="background: #16A34A; color: #FFFFFF; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 700; font-size: 0.82rem; cursor: pointer; box-shadow: 0 2px 6px rgba(22, 163, 74, 0.2);">
+                                            <i class="fa-solid fa-check-circle"></i> Resolve
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <span style="font-size: 0.8rem; color: #64748B; font-weight: 500;">
+                                        Resolved {{ e.resolved_at }}
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <!-- Blog & Advertisement Management Section -->
     <div class="card" style="margin: 0 0 28px 0; padding: 20px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
@@ -128,10 +215,47 @@
                             </td>
                             <td style="padding: 10px 14px; color: #64748B;">{{ b.created_at }}</td>
                             <td style="padding: 10px 14px; text-align: right;">
+                                <button type="button" class="btn btn-sm" style="background: #D97706; color: #FFF; border: none; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; margin-right: 4px;" onclick="toggleAdminForm('edit-blog-form-{{ b.id }}')">
+                                    Edit
+                                </button>
                                 <form method="POST" action="{{ url_for('admin.delete_blog', blog_id=b.id) }}" style="display: inline;" onsubmit="return confirm('Delete this blog post?');">
                                     <button type="submit" class="btn btn-sm" style="background: #DC2626; color: #FFF; border: none; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">
                                         Delete
                                     </button>
+                                </form>
+                            </td>
+                        </tr>
+                        <!-- Edit Blog Form Row -->
+                        <tr id="edit-blog-form-{{ b.id }}" style="display: none; background: #F8FAFC; border-bottom: 1px solid #E2E8F0;">
+                            <td colspan="4" style="padding: 16px;">
+                                <form method="POST" action="{{ url_for('admin.edit_blog', blog_id=b.id) }}">
+                                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 14px; margin-bottom: 12px;">
+                                        <div>
+                                            <label style="display: block; font-size: 0.82rem; font-weight: 600; color: #475569; margin-bottom: 4px;">Title</label>
+                                            <input type="text" name="title" value="{{ b.title }}" required style="width: 100%; padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 6px; box-sizing: border-box;">
+                                        </div>
+                                        <div>
+                                            <label style="display: block; font-size: 0.82rem; font-weight: 600; color: #475569; margin-bottom: 4px;">Category Badge</label>
+                                            <select name="category" style="width: 100%; padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 6px; box-sizing: border-box;">
+                                                <option value="PROMO" {% if b.category == 'PROMO' %}selected{% endif %}>PROMO</option>
+                                                <option value="SAFETY" {% if b.category == 'SAFETY' %}selected{% endif %}>SAFETY</option>
+                                                <option value="UPDATE" {% if b.category == 'UPDATE' %}selected{% endif %}>UPDATE</option>
+                                                <option value="NEWS" {% if b.category == 'NEWS' %}selected{% endif %}>NEWS</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div style="margin-bottom: 12px;">
+                                        <label style="display: block; font-size: 0.82rem; font-weight: 600; color: #475569; margin-bottom: 4px;">Image Cover URL</label>
+                                        <input type="url" name="image_url" value="{{ b.image_url }}" style="width: 100%; padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 6px; box-sizing: border-box;">
+                                    </div>
+                                    <div style="margin-bottom: 16px;">
+                                        <label style="display: block; font-size: 0.82rem; font-weight: 600; color: #475569; margin-bottom: 4px;">Content / Description</label>
+                                        <textarea name="content" rows="3" required style="width: 100%; padding: 8px 12px; border: 1px solid #CBD5E1; border-radius: 6px; box-sizing: border-box; font-family: inherit;">{{ b.content }}</textarea>
+                                    </div>
+                                    <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                                        <button type="button" class="btn btn-secondary btn-sm" onclick="toggleAdminForm('edit-blog-form-{{ b.id }}')">Cancel</button>
+                                        <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
+                                    </div>
                                 </form>
                             </td>
                         </tr>

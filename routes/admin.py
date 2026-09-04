@@ -7,14 +7,19 @@ Admins can manage platform infrastructure but cannot decrypt private user data.
 """
 
 from functools import wraps
-from flask import Blueprint, request, render_template, redirect, url_for, g, make_response
+from flask import Blueprint, request, render_template, redirect, url_for, g, make_response, jsonify
 import psycopg2.extras
 
 import db
 from crypto import rsa as rsa_crypto, ecc
 from crypto.password import hash_password, verify_password
 from crypto.key_wrap import wrap_private_key
-from routes.sessions import issue_session, require_login
+from routes.sessions import (
+    issue_session,
+    require_login,
+    require_role,
+    revoke_user_sessions,
+)
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -28,6 +33,10 @@ def require_admin(f):
         return f(*args, **kwargs)
     return decorated_function
 
+
+# ============================================================
+# Admin Login & Web Dashboard Routes
+# ============================================================
 
 @admin_bp.route("/login", methods=["GET", "POST"])
 def admin_login():
@@ -128,8 +137,39 @@ def admin_login():
 @require_admin
 def dashboard():
     """Uber-style Admin Dashboard."""
+    db.ensure_emergencies_table()
     with db.get_conn() as conn:
         with conn.cursor() as cur:
+            # Fetch active & resolved emergency alerts
+            cur.execute(
+                """
+                SELECT e.id, e.trip_id, e.status, e.created_at, e.resolved_at,
+                       u_r.username as rider_username,
+                       COALESCE(e.driver_name, u_d.username, 'Unassigned') as driver_name,
+                       COALESCE(e.driver_phone, 'N/A') as driver_phone,
+                       COALESCE(e.driver_vehicle, 'N/A') as driver_vehicle
+                FROM emergencies e
+                JOIN users u_r ON e.rider_id = u_r.id
+                LEFT JOIN users u_d ON e.driver_id = u_d.id
+                ORDER BY e.created_at DESC
+                """
+            )
+            emergencies_rows = cur.fetchall()
+            emergencies_list = [
+                {
+                    "id": str(r[0]),
+                    "trip_id": str(r[1]),
+                    "status": r[2],
+                    "created_at": r[3].strftime("%Y-%m-%d %H:%M") if r[3] else "N/A",
+                    "resolved_at": r[4].strftime("%Y-%m-%d %H:%M") if r[4] else "N/A",
+                    "rider": r[5],
+                    "driver_name": r[6],
+                    "driver_phone": r[7],
+                    "driver_vehicle": r[8],
+                }
+                for r in emergencies_rows
+            ]
+
             # Stats count
             cur.execute("SELECT COUNT(*) FROM users")
             total_users = cur.fetchone()[0]
@@ -199,9 +239,26 @@ def dashboard():
         "total_riders": total_riders,
         "total_drivers": total_drivers,
         "total_trips": total_trips,
+        "active_emergencies": sum(1 for e in emergencies_list if e["status"] == "active"),
     }
 
-    return render_template("admin_dashboard.html", stats=stats, users=users_list, trips=trips_list, blogs=blogs_list)
+    return render_template("admin_dashboard.html", stats=stats, users=users_list, trips=trips_list, blogs=blogs_list, emergencies=emergencies_list)
+
+
+@admin_bp.route("/emergencies/<emergency_id>/resolve", methods=["POST"])
+@require_admin
+def resolve_emergency(emergency_id):
+    """Mark an emergency alert as resolved."""
+    db.ensure_emergencies_table()
+    with db.get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "UPDATE emergencies SET status = 'resolved', resolved_at = NOW() WHERE id = %s",
+                (emergency_id,),
+            )
+        conn.commit()
+
+    return redirect(url_for("admin.dashboard"))
 
 
 @admin_bp.route("/users/<user_id>/toggle-status", methods=["POST"])
@@ -222,7 +279,7 @@ def toggle_user_status(user_id):
             
             # If suspended, revoke all active sessions
             if new_status == "suspended":
-                cur.execute("UPDATE sessions SET revoked = TRUE WHERE user_id = %s", (user_id,))
+                revoke_user_sessions(str(user_id))
 
         conn.commit()
 
@@ -285,3 +342,139 @@ def delete_blog(blog_id):
 
     return redirect(url_for("admin.dashboard"))
 
+
+# ============================================================
+# Admin JSON API Routes
+# ============================================================
+
+@admin_bp.route("/users", methods=["GET"])
+@require_login
+@require_role("admin")
+def list_users():
+    """
+    Return user account metadata.
+
+    No passwords, OTP secrets, private keys, or decrypted
+    sensitive information are returned.
+    """
+    with db.get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT id, username, role, status, created_at
+                FROM users
+                ORDER BY created_at DESC
+                """
+            )
+            rows = cur.fetchall()
+
+    users = [
+        {
+            "id": str(row[0]),
+            "username": row[1],
+            "role": row[2],
+            "status": row[3],
+            "created_at": row[4].isoformat() if row[4] else None,
+        }
+        for row in rows
+    ]
+
+    return jsonify({"users": users})
+
+
+@admin_bp.route("/users/<user_id>/suspend", methods=["POST"])
+@require_login
+@require_role("admin")
+def suspend_user(user_id):
+    """
+    Suspend a user and immediately revoke all of that user's active sessions.
+    """
+    current_user_id = getattr(g, "user_id", None)
+
+    if str(user_id) == str(current_user_id):
+        return jsonify({"error": "An administrator cannot suspend their own account"}), 400
+
+    with db.get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                UPDATE users
+                SET status = 'suspended'
+                WHERE id = %s
+                RETURNING id, username, status
+                """,
+                (user_id,)
+            )
+            row = cur.fetchone()
+        conn.commit()
+
+    if not row:
+        return jsonify({"error": "User not found"}), 404
+
+    revoke_user_sessions(str(user_id))
+
+    return jsonify({
+        "message": "User suspended",
+        "user": {
+            "id": str(row[0]),
+            "username": row[1],
+            "status": row[2],
+        },
+    })
+
+
+@admin_bp.route("/users/<user_id>/activate", methods=["POST"])
+@require_login
+@require_role("admin")
+def activate_user(user_id):
+    """
+    Reactivate a suspended account.
+    """
+    with db.get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                UPDATE users
+                SET status = 'active'
+                WHERE id = %s
+                RETURNING id, username, status
+                """,
+                (user_id,)
+            )
+            row = cur.fetchone()
+        conn.commit()
+
+    if not row:
+        return jsonify({"error": "User not found"}), 404
+
+    return jsonify({
+        "message": "User account activated",
+        "user": {
+            "id": str(row[0]),
+            "username": row[1],
+            "status": row[2],
+        },
+    })
+
+
+@admin_bp.route("/users/<user_id>/revoke-sessions", methods=["POST"])
+@require_login
+@require_role("admin")
+def revoke_sessions(user_id):
+    """
+    Revoke every active session belonging to a user.
+    """
+    with db.get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT id FROM users WHERE id = %s", (user_id,))
+            row = cur.fetchone()
+
+    if not row:
+        return jsonify({"error": "User not found"}), 404
+
+    revoke_user_sessions(str(user_id))
+
+    return jsonify({
+        "message": "All user sessions revoked",
+        "user_id": str(user_id),
+    })

@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Ride History - RideSafe{% endblock %}
+{% block main_class %}wide{% endblock %}
+
+{% block content %}
+<div class="dashboard-header"
+    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <a href="{{ url_for('trips.dashboard') }}"
+            style="background: #374151; color: #E5E7EB; padding: 8px 14px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #4B5563; box-shadow: 0 2px 6px rgba(0,0,0,0.25); transition: all 0.18s ease;"
+            onmouseover="this.style.background='#4B5563'" onmouseout="this.style.background='#374151'">
+            <i class="fa-solid fa-arrow-left" style="font-size: 0.82rem;"></i> Back to Dashboard
+        </a>
+        <h2 style="margin: 0; font-size: 1.5rem; color: #0F172A;">
+            <i class="fa-solid fa-clock-rotate-left" style="color: #2563EB;"></i> Trip History
+        </h2>
+    </div>
+</div>
+
+{% if trips %}
+<div class="trips-grid">
+    {% for trip in trips %}
+    <div class="trip-card card" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px;">
+        <div class="trip-header" style="display: flex; flex-direction: column; align-items: flex-start; gap: 12px; border-bottom: none; padding-bottom: 0;">
+            <div class="trip-route">
+                <strong class="route-text" style="font-size: 1.4rem; font-weight: 800; color: #0F172A;">{{ trip.pickup }} &rarr; {{ trip.dropoff }}</strong>
+            </div>
+            <div style="margin-bottom: 2px;">
+                <span class="badge badge-{{ trip.status|lower }}" style="font-size: 0.9rem; padding: 5px 12px; font-weight: 700; border-radius: 6px;">
+                    {{ trip.status|replace('_', ' ')|upper }}
+                </span>
+            </div>
+            <div class="trip-title-group" style="margin-bottom: 4px;">
+                <span class="trip-time">
+                    <i class="fa-regular fa-clock"></i> {{ trip.created_at.strftime('%b %d, %Y - %I:%M %p') if
+                    trip.created_at else '' }}
+                </span>
+            </div>
+
+            <div class="trip-actions" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-start;">
+                <a href="{{ url_for('chat.room', trip_id=trip.id) }}"
+                    style="display: inline-flex; align-items: center; gap: 6px; background: #1E293B; color: #CBD5E1; font-weight: 600; text-decoration: none; border-radius: 7px; padding: 8px 16px; font-size: 0.95rem; border: 1px solid #334155; box-shadow: 0 1px 4px rgba(0,0,0,0.2); transition: all 0.15s ease;"
+                    onmouseover="this.style.background='#334155'" onmouseout="this.style.background='#1E293B'"
+                    title="View Encrypted Chat Logs">
+                    <i class="fa-solid fa-comments" style="font-size: 0.9rem;"></i> Chat Logs
+                </a>
+
+                {% if trip.driver_details or trip.rider_details %}
+                <button type="button"
+                    style="display: inline-flex; align-items: center; gap: 6px; background: #243447; color: #BAE6FD; font-weight: 600; cursor: pointer; border: 1px solid #2D4A6A; border-radius: 7px; padding: 8px 16px; font-size: 0.95rem; box-shadow: 0 1px 4px rgba(0,0,0,0.2); transition: all 0.15s ease;"
+                    onmouseover="this.style.background='#2D4A6A'" onmouseout="this.style.background='#243447'"
+                    onclick="toggleDetails('details-{{ trip.id }}')">
+                    <i class="fa-solid fa-circle-info" style="font-size: 0.9rem;"></i> Details
+                </button>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Driver Details Bar (Toggleable, Hidden by Default) -->
+        {% if user_role == 'rider' and trip.driver_details %}
+        <div id="details-{{ trip.id }}"
+            style="display: none; width: 100%; margin-top: 16px; background: #F0F9FF; border: 1px solid #BAE6FD; border-radius: 8px; padding: 14px 16px; box-sizing: border-box;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span
+                    style="font-weight: 700; color: #0369A1; font-size: 0.92rem; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-id-card-clip" style="color: #0284C7;"></i> Driver Information
+                </span>
+                <span class="role-badge"
+                    style="background: #0284C7; color: #FFFFFF; font-size: 0.72rem; padding: 3px 8px;">DRIVER
+                    VERIFIED</span>
+            </div>
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; font-size: 0.88rem;">
+                <div>
+                    <div style="color: #64748B; font-size: 0.76rem; font-weight: 600; text-transform: uppercase;">Driver
+                        Name</div>
+                    <div style="font-weight: 600; color: #0F172A; margin-top: 2px;">
+                        <i class="fa-solid fa-user-gear" style="color: #0284C7;"></i> {{ trip.driver_details.name }}
+                    </div>
+                </div>
+                <div>
+                    <div style="color: #64748B; font-size: 0.76rem; font-weight: 600; text-transform: uppercase;">
+                        Contact Number</div>
+                    <div style="margin-top: 2px;">
+                        <a href="tel:{{ trip.driver_details.phone }}"
+                            style="color: #2563EB; font-weight: 600; text-decoration: none;">
+                            <i class="fa-solid fa-phone" style="color: #16A34A;"></i> {{ trip.driver_details.phone }}
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <div style="color: #64748B; font-size: 0.76rem; font-weight: 600; text-transform: uppercase;">
+                        Vehicle & License Plate</div>
+                    <div style="font-weight: 600; color: #0F172A; margin-top: 2px;">
+                        <i class="fa-solid fa-car-side" style="color: #0284C7;"></i> {{ trip.driver_details.vehicle_info
+                        }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Rider Details Bar (Toggleable, Hidden by Default) -->
+        {% if user_role == 'driver' and trip.rider_details %}
+        <div id="details-{{ trip.id }}"
+            style="display: none; width: 100%; margin-top: 16px; background: #ECFDF5; border: 1px solid #A7F3D0; border-radius: 8px; padding: 14px 16px; box-sizing: border-box;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span
+                    style="font-weight: 700; color: #047857; font-size: 0.92rem; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-user-check" style="color: #059669;"></i> Passenger Rider Information
+                </span>
+                <span class="role-badge"
+                    style="background: #059669; color: #FFFFFF; font-size: 0.72rem; padding: 3px 8px;">RIDER
+                    PASSENGER</span>
+            </div>
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; font-size: 0.88rem;">
+                <div>
+                    <div style="color: #64748B; font-size: 0.76rem; font-weight: 600; text-transform: uppercase;">Rider
+                        Name</div>
+                    <div style="font-weight: 600; color: #0F172A; margin-top: 2px;">
+                        <i class="fa-solid fa-user" style="color: #059669;"></i> {{ trip.rider_details.name }}
+                    </div>
+                </div>
+                <div>
+                    <div style="color: #64748B; font-size: 0.76rem; font-weight: 600; text-transform: uppercase;">
+                        Contact Number</div>
+                    <div style="margin-top: 2px;">
+                        <a href="tel:{{ trip.rider_details.phone }}"
+                            style="color: #2563EB; font-weight: 600; text-decoration: none;">
+                            <i class="fa-solid fa-phone" style="color: #16A34A;"></i> {{ trip.rider_details.phone }}
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <div style="color: #64748B; font-size: 0.76rem; font-weight: 600; text-transform: uppercase;">Pickup
+                        Spot</div>
+                    <div style="font-weight: 600; color: #0F172A; margin-top: 2px;">
+                        <i class="fa-solid fa-location-dot" style="color: #DC2626;"></i> {{ trip.pickup }}
+                    </div>
+                </div>
+                <div>
+                    <div style="color: #64748B; font-size: 0.76rem; font-weight: 600; text-transform: uppercase;">
+                        Destination Spot</div>
+                    <div style="font-weight: 600; color: #0F172A; margin-top: 2px;">
+                        <i class="fa-solid fa-flag-checkered" style="color: #16A34A;"></i> {{ trip.dropoff }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card empty-card" style="text-align: center; padding: 36px 20px;">
+    <i class="fa-solid fa-clock-rotate-left" style="font-size: 2.5rem; color: #94A3B8; margin-bottom: 12px;"></i>
+    <h3 style="margin: 0 0 6px 0; color: #334155; font-size: 1.1rem; font-weight: 700;">No trip history found</h3>
+    <p style="margin: 0; color: #64748B; font-size: 0.9rem;">Completed and cancelled trips will be archived here.</p>
+</div>
+{% endif %}
+
+<script>
+    function toggleDetails(elementId) {
+        var detailsDiv = document.getElementById(elementId);
+        if (detailsDiv.style.display === "none" || detailsDiv.style.display === "") {
+            detailsDiv.style.display = "block";
+        } else {
+            detailsDiv.style.display = "none";
+        }
+    }
+</script>
+{% endblock %}
