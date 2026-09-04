@@ -39,9 +39,6 @@ def _to_bytes(value) -> bytes:
 
 
 def _prepare_key(key: bytes) -> bytes:
-    """
-    Prepare HMAC key to exactly one SHA-256 block.
-    """
 
     # If key is longer than the block size, hash it first.
     if len(key) > _BLOCK_SIZE:
@@ -72,15 +69,6 @@ def _xor_block(block: bytes, value: int) -> bytes:
 # ============================================================
 
 def compute_mac(data: bytes, key: str) -> str:
-    """
-    Compute HMAC-SHA256 manually.
-
-    HMAC(K, m) =
-        H((K' XOR opad) || H((K' XOR ipad) || m))
-
-    Returns:
-        Hexadecimal MAC tag.
-    """
 
     message = _to_bytes(data)
     key_bytes = _to_bytes(key)

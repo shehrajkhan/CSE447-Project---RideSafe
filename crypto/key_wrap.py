@@ -9,7 +9,6 @@ import hashlib
 
 
 def derive_kek(password: str, salt: str) -> bytes:
-    """Derive a 32-byte Key Encryption Key (KEK) using iterated SHA-256."""
     salt_bytes = bytes.fromhex(salt) if isinstance(salt, str) else salt
     digest = hashlib.sha256(salt_bytes + password.encode("utf-8")).digest()
     for i in range(2_000):
@@ -18,7 +17,6 @@ def derive_kek(password: str, salt: str) -> bytes:
 
 
 def wrap_private_key(privkey_str: str, password: str, salt: str) -> str:
-    """Encrypt a private key string using XOR keystream derived from KEK."""
     if not privkey_str:
         return ""
     kek = derive_kek(password, salt)
@@ -35,7 +33,6 @@ def wrap_private_key(privkey_str: str, password: str, salt: str) -> str:
 
 
 def unwrap_private_key(wrapped_hex: str, password: str, salt: str) -> str:
-    """Decrypt a private key hex string using XOR keystream derived from KEK."""
     if not wrapped_hex:
         return ""
     kek = derive_kek(password, salt)

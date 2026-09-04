@@ -18,7 +18,6 @@ from typing import Tuple, Dict, List
 # 1. Modular Arithmetic & Extended Euclidean Algorithm
 # ---------------------------------------------------------------------------
 def egcd(a: int, b: int) -> Tuple[int, int, int]:
-    """Extended Greatest Common Divisor algorithm."""
     if a == 0:
         return b, 0, 1
     g, y, x = egcd(b % a, a)
@@ -26,7 +25,6 @@ def egcd(a: int, b: int) -> Tuple[int, int, int]:
 
 
 def mod_inverse(a: int, m: int) -> int:
-    """Computes modular inverse of a modulo m: (a * inv) % m == 1."""
     g, x, y = egcd(a, m)
     if g != 1:
         raise ValueError(f"Modular inverse does not exist for {a} mod {m}")
@@ -37,10 +35,6 @@ def mod_inverse(a: int, m: int) -> int:
 # 2. Miller-Rabin Primality Testing
 # ---------------------------------------------------------------------------
 def is_prime(n: int, k: int = 20) -> bool:
-    """
-    Miller-Rabin primality test.
-    Returns True if n is probabilistically prime, False if composite.
-    """
     if n < 2:
         return False
     if n in (2, 3):
@@ -76,7 +70,6 @@ def is_prime(n: int, k: int = 20) -> bool:
 
 
 def generate_prime(bits: int = 256) -> int:
-    """Generate a random prime of specified bit-length."""
     while True:
         # Generate random odd integer of bit-length `bits`
         p = secrets.randbits(bits)
@@ -89,13 +82,6 @@ def generate_prime(bits: int = 256) -> int:
 # 3. RSA Keypair Generation
 # ---------------------------------------------------------------------------
 def generate_keypair(key_size: int = 512) -> Tuple[str, str]:
-    """
-    Generate an RSA keypair.
-    key_size: total modulus size in bits (default 512 bits for fast performance).
-
-    Returns:
-        (private_key, public_key) as hex string pairs "n_hex:d_hex" and "n_hex:e_hex"
-    """
     prime_bits = key_size // 2
     e = 65537
 
@@ -121,13 +107,6 @@ def generate_keypair(key_size: int = 512) -> Tuple[str, str]:
 # 4. RSA Encryption & Decryption
 # ---------------------------------------------------------------------------
 def encrypt(plaintext: bytes, public_key: str) -> Dict[str, str]:
-    """
-    RSA-encrypt plaintext under the recipient's public key (n:e).
-    Chunks plaintext into blocks smaller than n.
-
-    Returns dict matching shared contract:
-        {"scheme": "rsa", "ciphertext": "<hex_blocks>", "mac": ""}
-    """
     if isinstance(plaintext, str):
         plaintext = plaintext.encode("utf-8")
 

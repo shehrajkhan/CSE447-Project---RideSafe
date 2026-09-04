@@ -28,13 +28,6 @@ def _get_mac_key():
 
 
 def canonical_payload(payload: dict) -> bytes:
-    """
-    Convert an encrypted payload into deterministic bytes.
-
-    The MAC field is excluded because the MAC authenticates
-    all the other fields.
-    """
-
     if not isinstance(payload, dict):
         raise TypeError(
             "payload must be a dictionary"
@@ -55,10 +48,6 @@ def canonical_payload(payload: dict) -> bytes:
 
 
 def attach_mac(payload: dict) -> dict:
-    """
-    Add an HMAC-SHA256 tag to an encrypted payload.
-    """
-
     protected_data = canonical_payload(
         payload
     )
@@ -76,11 +65,6 @@ def attach_mac(payload: dict) -> dict:
 
 
 def verify_payload_mac(payload: dict) -> bool:
-    """
-    Verify the MAC of an encrypted payload.
-
-    Returns False for malformed or tampered data.
-    """
 
     if not isinstance(payload, dict):
         return False

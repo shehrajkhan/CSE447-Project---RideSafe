@@ -42,14 +42,13 @@ Gy = 0x483ADA77_26A3C465_5DA4FBFC_0E1108A8_FD17B448_A6855419_9C47D08F_FB10D4B8
 N = 0xFFFFFFFF_FFFFFFFF_FFFFFFFF_FFFFFFFE_BAAEDCE6_AF48A03B_BFD25E8C_D0364141
 G = (Gx, Gy)
 
-INFINITY = None  # point at infinity / identity element
+INFINITY = None
 
 
 # ---------------------------------------------------------------------------
 # Modular arithmetic
 # ---------------------------------------------------------------------------
 def mod_inverse(k, m):
-    """Extended Euclidean algorithm - modular inverse of k mod m."""
     if k == 0:
         raise ZeroDivisionError("division by zero in mod_inverse")
     if k < 0:
@@ -96,7 +95,6 @@ def point_add(p1, p2):
 
 
 def scalar_mult(k, point):
-    """Double-and-add scalar multiplication: computes k * point."""
     if point is INFINITY or k % N == 0:
         return INFINITY
     if k < 0:
@@ -160,17 +158,6 @@ def _xor_bytes(a: bytes, b: bytes) -> bytes:
 # ECIES encrypt / decrypt (public contract functions)
 # ---------------------------------------------------------------------------
 def encrypt(plaintext: bytes, public_key: str) -> dict:
-    """
-    ECIES-style encryption against a hex-encoded public key:
-      1. Generate an ephemeral keypair (r, R = r*G)
-      2. Compute shared secret S = r * recipient_pub  (ECDH)
-      3. Derive a keystream from S, XOR with plaintext
-      4. Return ciphertext + ephemeral public key (needed to decrypt)
-
-    A fresh ephemeral key is used on every call, so encrypting the same
-    plaintext twice produces different ciphertext - important for things
-    like fares/timestamps where repeated values shouldn't be fingerprintable.
-    """
     if isinstance(plaintext, str):
         plaintext = plaintext.encode("utf-8")
 
@@ -192,7 +179,7 @@ def encrypt(plaintext: bytes, public_key: str) -> dict:
         "scheme": "ecies",
         "ciphertext": ciphertext.hex(),
         "ephemeral_pubkey": _point_to_hex(R),
-        "mac": "",  # whoever owns sessions/RBAC fills this in before storage
+        "mac": "", 
     }
 
 
@@ -213,7 +200,6 @@ def decrypt(ciphertext_blob: dict, private_key: str) -> bytes:
 
 
 if __name__ == "__main__":
-    # Quick manual sanity check - move to tests/test_ecc.py for the real suite
     priv, pub = generate_keypair()
     msg = b"pickup: 23.78,90.41 dropoff: 23.81,90.42 time: 14:32"
     enc = encrypt(msg, pub)

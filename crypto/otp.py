@@ -79,13 +79,6 @@ _OTP_LOCK = threading.Lock()
 # ---------------------------------------------------------------------------
 
 def generate_secret() -> str:
-    """
-    Generate a random per-user OTP secret.
-
-    This function is retained for the existing HOTP/TOTP implementation.
-    Email OTP login does not require a persistent OTP secret.
-    """
-
     return secrets.token_hex(SECRET_BYTES)
 
 
@@ -94,18 +87,6 @@ def generate_secret() -> str:
 # ---------------------------------------------------------------------------
 
 def hotp(secret: str, counter: int) -> str:
-    """
-    Generate a 6-digit HOTP code.
-
-    HOTP algorithm:
-
-        1. Convert counter to an 8-byte big-endian value.
-        2. Compute HMAC(secret, counter).
-        3. Apply dynamic truncation.
-        4. Reduce modulo 10^6.
-        5. Return a zero-padded 6-digit string.
-    """
-
     if not isinstance(secret, str):
         raise TypeError("secret must be a string")
 
@@ -159,11 +140,6 @@ def totp(
     secret: str,
     timestamp: Optional[int] = None
 ) -> str:
-    """
-    Generate the current TOTP code.
-
-    TOTP uses a 30-second time step.
-    """
 
     if not isinstance(secret, str):
         raise TypeError("secret must be a string")
@@ -186,11 +162,6 @@ def totp(
 
 
 def generate_otp(secret: str) -> str:
-    """
-    Generate the current TOTP code.
-
-    Retained for compatibility with the existing project.
-    """
 
     return totp(secret)
 
@@ -199,13 +170,6 @@ def verify_otp(
     secret: str,
     code: str
 ) -> bool:
-    """
-    Verify a TOTP code using the existing +/- 1 time-step window.
-
-    This function is retained for compatibility.
-
-    Email login uses verify_email_otp() instead.
-    """
 
     if not isinstance(secret, str):
         return False
@@ -254,11 +218,6 @@ def verify_otp(
 
 
 def generate_email_otp() -> str:
-    """
-    Generate a cryptographically random 6-digit OTP.
-
-    The OTP is not stored anywhere by this function.
-    """
 
     value = secrets.randbelow(1_000_000)
 
@@ -266,13 +225,6 @@ def generate_email_otp() -> str:
 
 
 def _otp_hash(code: str) -> str:
-    """
-    Create an HMAC-based verifier for an email OTP.
-
-    The actual OTP is never stored.
-
-    The application's RIDESAFE_MAC_KEY is used as the HMAC key.
-    """
 
     if not isinstance(code, str):
         raise TypeError("OTP code must be a string")
@@ -295,21 +247,6 @@ def create_email_otp_challenge(
     user_id: str,
     otp_code: str
 ) -> str:
-    """
-    Create a temporary email-OTP challenge.
-
-    The actual OTP is NOT stored.
-
-    Only:
-        - user_id
-        - HMAC hash of OTP
-        - expiration timestamp
-
-    are stored in server memory.
-
-    Returns:
-        Random challenge ID.
-    """
 
     if not isinstance(user_id, str):
         user_id = str(user_id)
@@ -337,20 +274,6 @@ def verify_email_otp(
     challenge_id: str,
     otp_code: str
 ):
-    """
-    Verify an email OTP.
-
-    Returns:
-        user_id if the OTP is valid.
-
-        None if:
-            - challenge doesn't exist
-            - OTP is incorrect
-            - OTP has expired
-            - OTP format is invalid
-
-    A successful OTP is immediately consumed and cannot be reused.
-    """
 
     if not isinstance(challenge_id, str):
         return None
@@ -416,11 +339,6 @@ def verify_email_otp(
 def discard_email_otp_challenge(
     challenge_id: str
 ) -> None:
-    """
-    Delete an email OTP challenge.
-
-    Used when sending the email fails or when login is cancelled.
-    """
 
     if not isinstance(challenge_id, str):
         return
@@ -435,11 +353,6 @@ def discard_email_otp_challenge(
 def get_email_otp_remaining_seconds(
     challenge_id: str
 ):
-    """
-    Return the number of seconds remaining for a challenge.
-
-    Returns None if the challenge does not exist or has expired.
-    """
 
     if not isinstance(challenge_id, str):
         return None
@@ -465,12 +378,6 @@ def get_email_otp_remaining_seconds(
 
 
 def _cleanup_expired_challenges():
-    """
-    Remove expired OTP challenges.
-
-    Caller must hold _OTP_LOCK.
-    """
-
     current_time = time.time()
 
     expired = [
