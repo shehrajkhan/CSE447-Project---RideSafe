@@ -46,7 +46,7 @@ for tamper detection and HOTP/TOTP for two-factor authentication.
    ```bash
    python app.py
    ```
-   Visit `http://localhost:5000`.
+   Visit `http://localhost:5001`.
 
 ## Project structure
 
@@ -63,4 +63,3 @@ supabase/        - database schema
 ## Branching
 
 All work happens on feature branches, merged into `main` via pull request.
-Don't commit directly to `main`.
